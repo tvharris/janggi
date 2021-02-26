@@ -29,10 +29,11 @@ class JanggiGame:
         False."""
 
 
-    def make_move(self, from, to):
+    def make_move(self, from_pos, to_pos):
         """
         Moves a piece from its current position to an allowed position, and may
         capture an opposing piece.
-        Parameters: from and to are strings representing positions (e.g., 'b3')
+        Parameters: from_pos and to_pos are strings representing positions
+            (e.g., 'b3')
         Returns: True if the move is allowed, otherwise False.
         """
