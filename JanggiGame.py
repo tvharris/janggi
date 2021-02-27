@@ -8,7 +8,7 @@ class JanggiGame:
     An implementation of the board game Janggi.
 
     Data members: See __init__
-    Methods: get_game_state, is_in_check, make_move
+    Methods: get_game_state, is_in_check, make_move, display_board
     """
 
     def __init__(self):
@@ -37,3 +37,33 @@ class JanggiGame:
             (e.g., 'b3')
         Returns: True if the move is allowed, otherwise False.
         """
+
+    def display_board(self):
+        """Displays the board with the pieces in their current positions."""
+        print('  a  b  c  d  e  f  g  h  i')
+        print('1 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |\ | /|  |  |  |')
+        print('2 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |/ | \|  |  |  |')
+        print('3 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |  |  |  |  |  |')
+        print('4 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |  |  |  |  |  |')
+        print('5 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |  |  |  |  |  |')
+        print('6 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |  |  |  |  |  |')
+        print('7 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |  |  |  |  |  |')
+        print('8 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |\ | /|  |  |  |')
+        print('9 +--+--+--+--+--+--+--+--+')
+        print('  |  |  |  |/ | \|  |  |  |')
+        print('10+--+--+--+--+--+--+--+--+')
+
+def main():
+    game = JanggiGame()
+    game.display_board()
+
+if __name__ == '__main__':
+    main()
