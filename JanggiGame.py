@@ -112,14 +112,15 @@ class JanggiGame:
 
 
 class Piece():
-    """Represents a Janggi piece.
+    """
+    Represents a Janggi piece.
 
     Data members: See __init__
-    Methods: get_position, set_position, get_moves,
+    Methods: get_position, set_position, get_hyp_moves,
         position_u, position_d, position_l, position_r,
         position_ul, position_ur, position_dl, position_dr
     """
-    def __init__(self):
+    def __init__(self, piece_id, position):
         """Creates a Janggi piece.
         Private data members:
             piece_id: string with format 'cxx#' where
@@ -131,13 +132,15 @@ class Piece():
                     of piece
             position: position on the board as 2 or 3-char string, with a letter
                 for the column, and number for the row (e.g., 'a1').
-            moves: dictionary of moves the piece can make with destination
-                positions as keys and lists of intermediate positions that must
-                be passed en route as values ({dest: [interm1, interm2]}).
+            hyp_moves: dictionary of hypothetical moves the piece can make with
+                destination positions as keys and lists of intermediate
+                positions that must be passed en route as values
+                ({dest: [interm1, interm2]}). Hypothetical moves do not consider
+                positions of other pieces.
         """
-        self._piece_id = None
-        self._position = None
-        self._moves = {}
+        self._piece_id = piece_id
+        self._position = position
+        self._hyp_moves = {}
 
     def get_position(self):
         """Returns the position on the board as 2 or 3-char string, with a letter
@@ -149,9 +152,9 @@ class Piece():
         with a letter for the column, and number for the row (e.g., 'a1')"""
         self._position = position
 
-    def get_moves(self):
+    def get_hyp_moves(self):
         """Returns the moves dictionary."""
-        return self._moves
+        return self._hyp_moves
 
     def position_u(self, position = None):
         """Returns the position directly above the piece's current position on
@@ -189,6 +192,19 @@ class Piece():
 
         position_l = chr(ord(position[0]) - 1) + position[1:]  # decrement letter
         return position_l
+
+    def position_r(self, position = None):
+        """Returns the position directly to the right of the piece's current
+        position on the board as a 2 or 3-char string. If the piece is already
+        at the far right on the board, returns None. Optionally takes a starting
+        position."""
+        if position is None:
+            position = self.get_position()
+        if position[0] == 'i':
+            return None
+
+        position_r = chr(ord(position[0]) + 1) + position[1:]  # increment letter
+        return position_r
 
     def position_ul(self, position = None):
         """Returns the position diagonally up and left of the current position
@@ -243,10 +259,71 @@ class Piece():
         return position_dr
 
 
+class Cannon(Piece):
+    """
+    Represents a cannon, a sub-class of Piece.
+
+    Data members: See __init__
+    Methods: inherited methods and update_moves
+    """
+    def __init__(self, piece_id, position):
+        """
+        Creates a cannon with the data members of a Piece. The parameters are
+        set as private data members as follows:
+            piece_id: (str) 'cca#', where the first c is the color r or b
+                      and # is 1 or 2
+            position: (str) board position, e.g., 'a1'
+        """
+        super().__init__(piece_id, position)
+
+    def update_hyp_moves(self):
+        """Updates and returns the piece's hypothetical moves dictionary. These
+        moves do not consider the locations of other pieces."""
+        hyp_moves = {}
+
+        # Iterate through all possible destinations, saving them with their
+        # corresponding intermediate positions.
+        # First, find positions above
+        destination = self.position_u()  # start at adjacent position
+        intermediates = []  # first intermediate is adjacent
+        while self.position_u(destination) is not None:
+            intermediates.append(destination)
+            destination = self.position_u(destination)
+            hyp_moves[destination] = list(intermediates)
+
+        # positions below
+        destination = self.position_d()  # start at adjacent position
+        intermediates = []  # first intermediate is adjacent
+        while self.position_d(destination) is not None:
+            intermediates.append(destination)
+            destination = self.position_d(destination)
+            hyp_moves[destination] = list(intermediates)
+
+        # positions left
+        destination = self.position_l()  # start at adjacent position
+        intermediates = []  # first intermediate is adjacent
+        while self.position_l(destination) is not None:
+            intermediates.append(destination)
+            destination = self.position_l(destination)
+            hyp_moves[destination] = list(intermediates)
+
+        # positions right
+        destination = self.position_r()  # start at adjacent position
+        intermediates = []  # first intermediate is adjacent
+        while self.position_r(destination) is not None:
+            intermediates.append(destination)
+            destination = self.position_r(destination)
+            hyp_moves[destination] = list(intermediates)
+
+        return hyp_moves
+
 
 def main():
-    game = JanggiGame()
-    game.display_board()
+    #game = JanggiGame()
+    #game.display_board()
+    cannon = Cannon('bca1', 'b8')
+    hyp_moves = cannon.update_hyp_moves()
+    print(hyp_moves)
 
 if __name__ == '__main__':
     main()
