@@ -110,6 +110,140 @@ class JanggiGame:
                 board.get('f10'), board.get('g10'), board.get('h10'), board.get('i10')
                 ))
 
+
+class Piece():
+    """Represents a Janggi piece.
+
+    Data members: See __init__
+    Methods: get_position, set_position, get_moves,
+        position_u, position_d, position_l, position_r,
+        position_ul, position_ur, position_dl, position_dr
+    """
+    def __init__(self):
+        """Creates a Janggi piece.
+        Private data members:
+            piece_id: string with format 'cxx#' where
+                c is the color 'r' or 'b',
+                xx is the piece: cannon = 'ca', chariot = 'ch', elephant = 'el',
+                                 general = 'ge', guard = 'gu', horse = 'ho',
+                                 soldier = 'so'
+                # is a number 1-5, for distinguishing between the same type
+                    of piece
+            position: position on the board as 2 or 3-char string, with a letter
+                for the column, and number for the row (e.g., 'a1').
+            moves: dictionary of moves the piece can make with destination
+                positions as keys and lists of intermediate positions that must
+                be passed en route as values ({dest: [interm1, interm2]}).
+        """
+        self._piece_id = None
+        self._position = None
+        self._moves = {}
+
+    def get_position(self):
+        """Returns the position on the board as 2 or 3-char string, with a letter
+        for the column, and number for the row (e.g., 'a1')"""
+        return self._position
+
+    def set_position(self, position):
+        """Sets the position on the board to the specified 2 or 3-char string,
+        with a letter for the column, and number for the row (e.g., 'a1')"""
+        self._position = position
+
+    def get_moves(self):
+        """Returns the moves dictionary."""
+        return self._moves
+
+    def position_u(self, position = None):
+        """Returns the position directly above the piece's current position on
+        the board as a 2 or 3-char string. If the piece is already at the top of
+        the board, returns None. Optionally takes a starting position."""
+        if position is None:
+            position = self.get_position()
+        if position[1:] == '1':  # already at top of board
+            return None
+
+        position_u = position[0] + str(int(position[1:]) - 1)  # decrement row
+        return position_u
+
+    def position_d(self, position = None):
+        """Returns the position directly below the piece's current position on
+        the board as a 2 or 3-char string. If the piece is already at the bottom
+        of the board, returns None. Optionally takes a starting position."""
+        if position is None:
+            position = self.get_position()
+        if position[1:] == '10':  # already at bottom of board
+            return None
+
+        position_d = position[0] + str(int(position[1:]) + 1)  # increment row
+        return position_d
+
+    def position_l(self, position = None):
+        """Returns the position directly to the left of the piece's current
+        position on the board as a 2 or 3-char string. If the piece is already
+        at the far left on the board, returns None. Optionally takes a starting
+        position."""
+        if position is None:
+            position = self.get_position()
+        if position[0] == 'a':
+            return None
+
+        position_l = chr(ord(position[0]) - 1) + position[1:]  # decrement letter
+        return position_l
+
+    def position_ul(self, position = None):
+        """Returns the position diagonally up and left of the current position
+        on the board as a 2 or 3-char string. If the piece is already at the far
+        left or top of the board, returns None. Optionally takes a starting
+        position"""
+        if position is None:
+            position = self.get_position()
+        if position[0] == 'a' or position[1:] == '0':  # already at left or top
+            return None
+
+        position_ul = chr(ord(position[0]) - 1) + str(int(position[1:]) - 1)
+        return position_ul
+
+    def position_ur(self, position = None):
+        """Returns the position diagonally up and left of the current position
+        on the board as a 2 or 3-char string. If the piece is already at the far
+        right or top of the board, returns None. Optionally takes a starting
+        position"""
+        if position is None:
+            position = self.get_position()
+        if position[0] == 'i' or position[1:] == '0':  # already at right or top
+            return None
+
+        position_ur = chr(ord(position[0]) + 1) + str(int(position[1:]) - 1)
+        return position_ur
+
+    def position_dl(self, position = None):
+        """Returns the position diagonally up and left of the current position
+        on the board as a 2 or 3-char string. If the piece is already at the far
+        left or bottom of the board, returns None. Optionally takes a starting
+        position"""
+        if position is None:
+            position = self.get_position()
+        if position[0] == 'a' or position[1:] == '10':  # already at edge
+            return None
+
+        position_dl = chr(ord(position[0]) - 1) + str(int(position[1:]) + 1)
+        return position_dl
+
+    def position_dr(self, position = None):
+        """Returns the position diagonally up and left of the current position
+        on the board as a 2 or 3-char string. If the piece is already at the far
+        right or bottom of the board, returns None. Optionally takes a starting
+        position"""
+        if position is None:
+            position = self.get_position()
+        if position[0] == 'i' or position[1:] == '10':  # already at edge
+            return None
+
+        position_dr = chr(ord(position[0]) + 1) + str(int(position[1:]) + 1)
+        return position_dr
+
+
+
 def main():
     game = JanggiGame()
     game.display_board()
