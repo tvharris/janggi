@@ -37,7 +37,7 @@ class JanggiGame:
                        'a9': 'x', 'b9': 'x', 'c9': 'x', 'd9': 'x', 'e9': 'bge',
                        'f9': 'x', 'g9': 'x', 'h9': 'x', 'i9': 'x',
                        'a10': 'bch1', 'b10': 'bel1', 'c10': 'bho1', 'd10': 'bgu1', 'e10': 'x',
-                       'f10': 'bgu2', 'g10': 'bel2', 'h10': 'bho2', 'i10': 'bch2',
+                       'f10': 'bgu2', 'g10': 'bel2', 'h10': 'bho2', 'i10': 'bch2'}
 
     def get_game_state(self):
         """Returns game state which may be 'UNFINISHED', 'RED_WON', or
