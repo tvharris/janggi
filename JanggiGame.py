@@ -460,9 +460,9 @@ class General(Piece):
                 # check whether destination is in the palace
                 if destination[0] < 'd' or destination[0] > 'f':
                     continue
-                if color == 'b' and destination[1:] < '8':
+                if color == 'b' and int(destination[1:]) < 8:
                     continue
-                if color == 'r' and destination[1:] > '3':
+                if color == 'r' and int(destination[1:]) > 3:
                     continue
 
                 hyp_moves[destination] = []  # one step so no intermediates
@@ -549,8 +549,8 @@ class Soldier(Piece):
             destination = next_position()
             if destination is not None:
                 hyp_moves[destination] = []
-                #TODO: may not want to use dictionary for soldiers which
-                # never have intermediates
+                #TODO: may not want to use dictionary for soldiers, generals,
+                # and guards, which never have intermediates
 
         # soldiers can move diagonally forward in the palace
         position = self.get_position()
@@ -589,7 +589,7 @@ def main():
     soldier = Soldier('bso1', 'e2')
     hyp_moves = soldier.update_hyp_moves()
     print(hyp_moves)
-    general = General('rge1', 'd3')
+    general = General('bge1', 'd8')
     hyp_moves = general.update_hyp_moves()
     print(hyp_moves)
 
