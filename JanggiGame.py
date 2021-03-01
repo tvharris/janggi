@@ -361,24 +361,17 @@ class Chariot(Piece):
         position = self.get_position()
 
         if position == 'd1' or position == 'd8':
-            destination = self.position_dr()
-            hyp_moves[destination] = []  # add center of palace to dict
-            hyp_moves[self.position_dr(destination)] = [destination]  # opp. corner
-
+            next_position = self.position_dr
         if position == 'f1' or position == 'f8':
-            destination = self.position_dl()
-            hyp_moves[destination] = []
-            hyp_moves[self.position_dl(destination)] = [destination]
-
+            next_position = self.position_dl
         if position == 'd3' or position == 'd10':
-            destination = self.position_ur()
-            hyp_moves[destination] = []
-            hyp_moves[self.position_ur(destination)] = [destination]
-
+            next_position = self.position_ur
         if position == 'f3' or position == 'f10':
-            destination = self.position_ul()
-            hyp_moves[destination] = []
-            hyp_moves[self.position_ul(destination)] = [destination]
+            next_position = self.position_ul
+
+        destination = next_position()
+        hyp_moves[destination] = []  # add center of palace to dict
+        hyp_moves[next_position(destination)] = [destination]  # opp. corner
 
         return hyp_moves
 
