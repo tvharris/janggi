@@ -419,6 +419,51 @@ class Elephant(Piece):
 
         return hyp_moves
 
+class Horse(Piece):
+    """
+    Represents a horse, a sub-class of Piece.
+    Horses move horizontally or vertically one space and then one space
+    diagonally outward to arrive at their destination. They may not jump other
+    pieces.
+
+    Data members: See __init__
+    Methods: inherited methods and update_hyp_moves
+    """
+    def __init__(self, piece_id, position):
+        """
+        Creates a horse with the data members of a Piece. The parameters are
+        set as private data members as follows:
+            piece_id: (str) 'cho#', where the first c is the color r or b
+                      and # is 1 or 2
+            position: (str) board position, e.g., 'a1'
+        """
+        super().__init__(piece_id, position)
+
+    def update_hyp_moves(self):
+        """Updates and returns the piece's hypothetical moves dictionary. These
+        moves do not consider the locations of other pieces."""
+        hyp_moves = {}
+
+        # each horizontal/vertical direction splits into two diagonal directions
+        for next_position, branch_positions in {
+            self.position_u: [self.position_ul, self.position_ur],
+            self.position_d: [self.position_dl, self.position_dr],
+            self.position_l: [self.position_ul, self.position_dl],
+            self.position_r: [self.position_ur, self.position_dr]
+        }.items():
+
+            # the intermediate is adjacent
+            intermediate = next_position()
+            if intermediate is not None:
+
+                # for each diagonal direction, take a step to the destination
+                for branch_position in branch_positions:
+                    destination = branch_position(intermediate)
+                    if destination is not None:
+                        hyp_moves[destination] = [intermediate]
+
+        return hyp_moves
+
 def main():
     #game = JanggiGame()
     #game.display_board()
@@ -430,6 +475,9 @@ def main():
     print(hyp_moves)
     elephant = Elephant('bch1', 'e3')
     hyp_moves = elephant.update_hyp_moves()
+    print(hyp_moves)
+    horse = Horse('bch1', 'e3')
+    hyp_moves = horse.update_hyp_moves()
     print(hyp_moves)
 
 if __name__ == '__main__':
