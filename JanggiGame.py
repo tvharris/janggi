@@ -371,6 +371,47 @@ class Chariot(Piece):
 
         return hyp_moves
 
+
+class Elephant(Piece):
+    """
+    Represents an elephant, a sub-class of Piece.
+    Elephants move horizontally or vertically one space and then two spaces
+    diagonally outward to arrive at their destination. They may not jump other
+    pieces.
+
+    Data members: See __init__
+    Methods: inherited methods and update_hyp_moves
+    """
+    def __init__(self, piece_id, position):
+        """
+        Creates an elephant with the data members of a Piece. The parameters are
+        set as private data members as follows:
+            piece_id: (str) 'cel#', where the first c is the color r or b
+                      and # is 1 or 2
+            position: (str) board position, e.g., 'a1'
+        """
+        super().__init__(piece_id, position)
+
+    def update_hyp_moves(self):
+        """Updates and returns the piece's hypothetical moves dictionary. These
+        moves do not consider the locations of other pieces."""
+        hyp_moves = {}
+
+        intermediate_1 = self.position_u()
+        if intermediate_1 is not None:
+
+            intermediate_2a = self.position_ul(intermediate_1)
+            if intermediate_2a is not None:
+                hyp_moves[self.position_ul(intermediate_2a)] = \
+                    [intermediate_1, intermediate_2a]
+
+            intermediate_2b = self.position_ur(intermediate_1)
+            if intermediate_2b is not None:
+                hyp_moves[self.position_ur(intermediate_2b)] = \
+                    [intermediate_1, intermediate_2b]
+
+        return hyp_moves
+
 def main():
     #game = JanggiGame()
     #game.display_board()
@@ -379,6 +420,9 @@ def main():
     print(hyp_moves)
     chariot = Chariot('bch1', 'f3')
     hyp_moves = chariot.update_hyp_moves()
+    print(hyp_moves)
+    elephant = Elephant('bch1', 'e3')
+    hyp_moves = elephant.update_hyp_moves()
     print(hyp_moves)
 
 if __name__ == '__main__':
