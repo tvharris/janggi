@@ -357,6 +357,29 @@ class Chariot(Piece):
                 # previous destination is intermediate of next destination
                 intermediates.append(destination)
 
+        # chariots can move diagonally from the corners of the palace
+        position = self.get_position()
+
+        if position == 'd1' or position == 'd8':
+            destination = self.position_dr()
+            hyp_moves[destination] = []  # add center of palace to dict
+            hyp_moves[self.position_dr(destination)] = [destination]  # opp. corner
+
+        if position == 'f1' or position == 'f8':
+            destination = self.position_dl()
+            hyp_moves[destination] = []
+            hyp_moves[self.position_dl(destination)] = [destination]
+
+        if position == 'd3' or position == 'd10':
+            destination = self.position_ur()
+            hyp_moves[destination] = []
+            hyp_moves[self.position_ur(destination)] = [destination]
+
+        if position == 'f3' or position == 'f10':
+            destination = self.position_ul()
+            hyp_moves[destination] = []
+            hyp_moves[self.position_ul(destination)] = [destination]
+
         return hyp_moves
 
 def main():
@@ -365,7 +388,7 @@ def main():
     cannon = Cannon('bca1', 'f3')
     hyp_moves = cannon.update_hyp_moves()
     print(hyp_moves)
-    chariot = Chariot('bch1', 'b8')
+    chariot = Chariot('bch1', 'f3')
     hyp_moves = chariot.update_hyp_moves()
     print(hyp_moves)
 
