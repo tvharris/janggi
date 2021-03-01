@@ -116,7 +116,7 @@ class Piece():
     Represents a Janggi piece.
 
     Data members: See __init__
-    Methods: get_position, set_position, get_hyp_moves,
+    Methods: get_position, set_position, get_hyp_moves, get piece_id
         position_u, position_d, position_l, position_r,
         position_ul, position_ur, position_dl, position_dr
     """
@@ -141,6 +141,10 @@ class Piece():
         self._piece_id = piece_id
         self._position = position
         self._hyp_moves = {}
+
+    def get_piece_id(self):
+        """Returns the piece_id"""
+        return self._piece_id
 
     def get_position(self):
         """Returns the position on the board as 2 or 3-char string, with a letter
@@ -270,7 +274,7 @@ class Cannon(Piece):
     """
     def __init__(self, piece_id, position):
         """
-        Creates a cannon with the data members of a Piece. The parameters are
+        Creates a Cannon with the data members of a Piece. The parameters are
         set as private data members as follows:
             piece_id: (str) 'cca#', where the first c is the color r or b
                       and # is 1 or 2
@@ -326,7 +330,7 @@ class Chariot(Piece):
     """
     def __init__(self, piece_id, position):
         """
-        Creates a chariot with the data members of a Piece. The parameters are
+        Creates a Chariot with the data members of a Piece. The parameters are
         set as private data members as follows:
             piece_id: (str) 'cch#', where the first c is the color r or b
                       and # is 1 or 2
@@ -384,7 +388,7 @@ class Elephant(Piece):
     """
     def __init__(self, piece_id, position):
         """
-        Creates an elephant with the data members of a Piece. The parameters are
+        Creates an Elephant with the data members of a Piece. The parameters are
         set as private data members as follows:
             piece_id: (str) 'cel#', where the first c is the color r or b
                       and # is 1 or 2
@@ -433,7 +437,7 @@ class Horse(Piece):
     """
     def __init__(self, piece_id, position):
         """
-        Creates a horse with the data members of a Piece. The parameters are
+        Creates a Horse with the data members of a Piece. The parameters are
         set as private data members as follows:
             piece_id: (str) 'cho#', where the first c is the color r or b
                       and # is 1 or 2
@@ -466,6 +470,63 @@ class Horse(Piece):
 
         return hyp_moves
 
+class Soldier(Piece):
+    """
+    Represents a soldier, a sub-class of Piece.
+    Soldiers can move forward or sideways one space.
+
+    Data members: See __init__
+    Methods: inherited methods and update_hyp_moves
+    """
+    def __init__(self, piece_id, position):
+        """
+        Creates a Soldier with the data members of a Piece. The parameters are
+        set as private data members as follows:
+            piece_id: (str) 'cso#', where the first c is the color r or b
+                      and # is 1 or 2
+            position: (str) board position, e.g., 'a1'
+        """
+        super().__init__(piece_id, position)
+
+    def update_hyp_moves(self):
+        """Updates and returns the piece's hypothetical moves dictionary. These
+        moves do not consider the locations of other pieces."""
+        hyp_moves = {}
+        color = self.get_piece_id()[0]  # 'b' or 'r'
+
+        # forward direction depends on the color
+        if color == 'b':
+            forward = self.position_u
+        else:
+            forward = self.position_d
+
+        # iterate through all possible destinations, saving them with their
+        for next_position in [forward, self.position_l, self.position_r]:
+            destination = next_position()
+            if destination is not None:
+                hyp_moves[destination] = []
+                #TODO: may not want to use dictionary for soldiers which
+                # never have intermediates
+
+        # soldiers can move diagonally forward in the palace
+        position = self.get_position()
+
+        if color == 'b':
+            if position == 'd3' or position == 'f3':  # palace corners
+                hyp_moves['e2'] = []
+            if position == 'e2':  # palace center
+                hyp_moves['d1'] = []
+                hyp_moves['f1'] = []
+
+        else:  # color == 'r'
+            if position == 'd8' or position == 'f8':  # palace corners
+                hyp_moves['e9'] = []
+            if position == 'e9':  # palace center
+                hyp_moves['d10'] = []
+                hyp_moves['f10'] = []
+
+        return hyp_moves
+
 def main():
     #game = JanggiGame()
     #game.display_board()
@@ -475,11 +536,14 @@ def main():
     chariot = Chariot('bch1', 'f3')
     hyp_moves = chariot.update_hyp_moves()
     print(hyp_moves)
-    elephant = Elephant('bch1', 'e3')
+    elephant = Elephant('bel1', 'e3')
     hyp_moves = elephant.update_hyp_moves()
     print(hyp_moves)
-    horse = Horse('bch1', 'e3')
+    horse = Horse('bho1', 'e3')
     hyp_moves = horse.update_hyp_moves()
+    print(hyp_moves)
+    soldier = Soldier('bso1', 'e2')
+    hyp_moves = soldier.update_hyp_moves()
     print(hyp_moves)
 
 if __name__ == '__main__':
