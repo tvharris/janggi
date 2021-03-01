@@ -397,18 +397,25 @@ class Elephant(Piece):
         moves do not consider the locations of other pieces."""
         hyp_moves = {}
 
-        intermediate_1 = self.position_u()
-        if intermediate_1 is not None:
+        # each horizontal/vertical direction splits into two diagonal directions
+        for next_position, branch_positions in {
+            self.position_u: [self.position_ul, self.position_ur],
+            self.position_d: [self.position_dl, self.position_dr],
+            self.position_l: [self.position_ul, self.position_dl],
+            self.position_r: [self.position_ur, self.position_dr]
+            }.items():
 
-            intermediate_2a = self.position_ul(intermediate_1)
-            if intermediate_2a is not None:
-                hyp_moves[self.position_ul(intermediate_2a)] = \
-                    [intermediate_1, intermediate_2a]
+            # the first intermediate is adjacent
+            intermediate_1 = next_position()
+            if intermediate_1 is not None:
 
-            intermediate_2b = self.position_ur(intermediate_1)
-            if intermediate_2b is not None:
-                hyp_moves[self.position_ur(intermediate_2b)] = \
-                    [intermediate_1, intermediate_2b]
+                # for each diagonal direction, take two more steps to arrive at
+                # the destination and pass a second intermediate
+                for branch_position in branch_positions:
+                    intermediate_2 = branch_position(intermediate_1)
+                    if intermediate_2 is not None:
+                        hyp_moves[branch_position(intermediate_2)] = \
+                            [intermediate_1, intermediate_2]
 
         return hyp_moves
 
