@@ -217,7 +217,7 @@ class Piece():
         position"""
         if position is None:
             position = self.get_position()
-        if position[0] == 'a' or position[1:] == '0':  # already at left or top
+        if position[0] == 'a' or position[1:] == '1':  # already at left or top
             return None
 
         position_ul = chr(ord(position[0]) - 1) + str(int(position[1:]) - 1)
@@ -230,7 +230,7 @@ class Piece():
         position"""
         if position is None:
             position = self.get_position()
-        if position[0] == 'i' or position[1:] == '0':  # already at right or top
+        if position[0] == 'i' or position[1:] == '1':  # already at right or top
             return None
 
         position_ur = chr(ord(position[0]) + 1) + str(int(position[1:]) - 1)
@@ -425,6 +425,50 @@ class Elephant(Piece):
 
         return hyp_moves
 
+class General(Piece):
+    """
+    Represents a General, a sub-class of Piece.
+    Generals are confined to the palace. They can move one space in any
+    direction.
+
+    Data members: See __init__
+    Methods: inherited methods and update_hyp_moves
+    """
+    def __init__(self, piece_id, position):
+        """
+        Creates a General with the data members of a Piece. The parameters are
+        set as private data members as follows:
+            piece_id: (str) 'cge1', where the first c is the color r or b
+            position: (str) board position, e.g., 'e2'
+        """
+        super().__init__(piece_id, position)
+
+    def update_hyp_moves(self):
+        """Updates and returns the piece's hypothetical moves dictionary. These
+        moves do not consider the locations of other pieces."""
+        hyp_moves = {}
+        color = self.get_piece_id()[0]  # 'b' or 'r'
+
+        # iterate through all possible destinations
+        for next_position in [self.position_ul, self.position_u, self.position_ur,
+                              self.position_l,                   self.position_r,
+                              self.position_dl, self.position_d, self.position_dr]:
+
+            destination = next_position()
+            if destination is not None:
+
+                # check whether destination is in the palace
+                if destination[0] < 'd' or destination[0] > 'f':
+                    continue
+                if color == 'b' and destination[1:] < '8':
+                    continue
+                if color == 'r' and destination[1:] > '3':
+                    continue
+
+                hyp_moves[destination] = []  # one step so no intermediates
+
+        return hyp_moves
+
 class Horse(Piece):
     """
     Represents a horse, a sub-class of Piece.
@@ -500,7 +544,7 @@ class Soldier(Piece):
         else:
             forward = self.position_d
 
-        # iterate through all possible destinations, saving them with their
+        # iterate through all possible destinations
         for next_position in [forward, self.position_l, self.position_r]:
             destination = next_position()
             if destination is not None:
@@ -544,6 +588,9 @@ def main():
     print(hyp_moves)
     soldier = Soldier('bso1', 'e2')
     hyp_moves = soldier.update_hyp_moves()
+    print(hyp_moves)
+    general = General('rge1', 'd3')
+    hyp_moves = general.update_hyp_moves()
     print(hyp_moves)
 
 if __name__ == '__main__':
