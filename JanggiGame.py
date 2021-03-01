@@ -153,7 +153,7 @@ class Piece():
         self._position = position
 
     def get_hyp_moves(self):
-        """Returns the moves dictionary."""
+        """Returns the hyp_moves dictionary."""
         return self._hyp_moves
 
     def position_u(self, position = None):
@@ -281,42 +281,21 @@ class Cannon(Piece):
         moves do not consider the locations of other pieces."""
         hyp_moves = {}
 
-        # Iterate through all possible destinations, saving them with their
-        # corresponding intermediate positions.
-        # First, find positions above
-        destination = self.position_u()  # start at adjacent position
-        intermediates = []  # first intermediate is adjacent
-        while self.position_u(destination) is not None:
-            intermediates.append(destination)
-            destination = self.position_u(destination)
-            hyp_moves[destination] = list(intermediates)
-
-        # positions below
-        destination = self.position_d()  # start at adjacent position
-        intermediates = []  # first intermediate is adjacent
-        while self.position_d(destination) is not None:
-            intermediates.append(destination)
-            destination = self.position_d(destination)
-            hyp_moves[destination] = list(intermediates)
-
-        # positions left
-        destination = self.position_l()  # start at adjacent position
-        intermediates = []  # first intermediate is adjacent
-        while self.position_l(destination) is not None:
-            intermediates.append(destination)
-            destination = self.position_l(destination)
-            hyp_moves[destination] = list(intermediates)
-
-        # positions right
-        destination = self.position_r()  # start at adjacent position
-        intermediates = []  # first intermediate is adjacent
-        while self.position_r(destination) is not None:
-            intermediates.append(destination)
-            destination = self.position_r(destination)
-            hyp_moves[destination] = list(intermediates)
+        # iterate through all possible destinations, saving them with their
+        # corresponding intermediate positions as {dest.: [interm1, interm2, ...]}
+        for next_position in [self.position_u, self.position_d,
+                              self.position_l, self.position_r]:
+            # start at adjacent position because cannon can't move to it
+            destination = next_position()
+            intermediates = []
+            while next_position(destination) is not None:
+                # previous destination is intermediate of next destination
+                intermediates.append(destination)
+                destination = next_position(destination)
+                # add destination and its intermediates to dictionary
+                hyp_moves[destination] = list(intermediates)
 
         return hyp_moves
-
 
 def main():
     #game = JanggiGame()
