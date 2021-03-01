@@ -297,6 +297,26 @@ class Cannon(Piece):
                 # add destination and its intermediates to dictionary
                 hyp_moves[destination] = list(intermediates)
 
+        # cannons can jump diagonally from the corners of the palace
+        position = self.get_position()
+        if position == 'd1' or position == 'd8':
+            intermediate = self.position_dr()  # center of a palace
+            destination = self.position_dr(intermediate)
+
+        if position == 'f1' or position == 'f8':
+            intermediate = self.position_dl()
+            destination = self.position_dl(intermediate)
+
+        if position == 'd3' or position == 'd10':
+            intermediate = self.position_ur()
+            destination = self.position_ur(intermediate)
+
+        if position == 'f3' or position == 'f10':
+            intermediate = self.position_ul()
+            destination = self.position_ul(intermediate)
+
+        hyp_moves[destination] = [intermediate]
+
         return hyp_moves
 
 class Chariot(Piece):
@@ -342,7 +362,7 @@ class Chariot(Piece):
 def main():
     #game = JanggiGame()
     #game.display_board()
-    cannon = Cannon('bca1', 'b8')
+    cannon = Cannon('bca1', 'f3')
     hyp_moves = cannon.update_hyp_moves()
     print(hyp_moves)
     chariot = Chariot('bch1', 'b8')
