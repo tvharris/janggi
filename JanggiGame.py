@@ -428,8 +428,9 @@ class Elephant(Piece):
 class General(Piece):
     """
     Represents a General, a sub-class of Piece.
-    Generals are confined to the palace. They can move one space in any
-    direction.
+    Generals are confined to the palace. They can move one step horizontally or
+    vertically. They can also move diagonally if they are at a corner or center
+    of the palace.
 
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
@@ -449,10 +450,9 @@ class General(Piece):
         hyp_moves = {}
         color = self.get_piece_id()[0]  # 'b' or 'r'
 
-        # iterate through all possible destinations
-        for next_position in [self.position_ul, self.position_u, self.position_ur,
-                              self.position_l,                   self.position_r,
-                              self.position_dl, self.position_d, self.position_dr]:
+        # iterate through horizontal and vertical destinations
+        for next_position in [self.position_u, self.position_d,
+                              self.position_l, self.position_r]:
 
             destination = next_position()
             if destination is not None:
@@ -466,6 +466,28 @@ class General(Piece):
                     continue
 
                 hyp_moves[destination] = []  # one step so no intermediates
+
+        # diagonal destinations
+        position = self.get_position()
+        if color == 'r':
+            red_corners = {'d1', 'f1', 'd3', 'f3'}
+            red_center = 'e2'
+
+            if position in red_corners:
+                hyp_moves[red_center] = []
+            if position == red_center:
+                for corner in red_corners:
+                    hyp_moves[corner] = []
+
+        else:  # color == 'b'
+            blue_corners = {'d8', 'f8', 'd10', 'f10'}
+            blue_center = 'e9'
+
+            if position in blue_corners:
+                hyp_moves[blue_center] = []
+            if position == blue_center:
+                for corner in blue_corners:
+                    hyp_moves[corner] = []
 
         return hyp_moves
 
@@ -589,7 +611,7 @@ def main():
     soldier = Soldier('bso1', 'e2')
     hyp_moves = soldier.update_hyp_moves()
     print(hyp_moves)
-    general = General('bge1', 'd8')
+    general = General('rge1', 'f2')
     hyp_moves = general.update_hyp_moves()
     print(hyp_moves)
 
