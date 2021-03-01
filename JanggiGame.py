@@ -414,8 +414,10 @@ class Elephant(Piece):
                 for branch_position in branch_positions:
                     intermediate_2 = branch_position(intermediate_1)
                     if intermediate_2 is not None:
-                        hyp_moves[branch_position(intermediate_2)] = \
-                            [intermediate_1, intermediate_2]
+                        destination = branch_position(intermediate_2)
+                        if destination is not None:
+                            hyp_moves[destination] = \
+                                [intermediate_1, intermediate_2]
 
         return hyp_moves
 
