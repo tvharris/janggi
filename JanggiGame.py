@@ -491,6 +491,75 @@ class General(Piece):
 
         return hyp_moves
 
+class Guard(Piece):
+    """
+    Represents a Guard, a sub-class of Piece.
+    Guards are confined to the palace. They can move one step horizontally or
+    vertically. They can also move diagonally if they are at a corner or center
+    of the palace.
+
+    Data members: See __init__
+    Methods: inherited methods and update_hyp_moves
+    """
+    def __init__(self, piece_id, position):
+        """
+        Creates a Guard with the data members of a Piece. The parameters are
+        set as private data members as follows:
+            piece_id: (str) 'cgu#', where the first c is the color r or b
+                      and # is 1 or 2
+            position: (str) board position, e.g., 'e2'
+        """
+        super().__init__(piece_id, position)
+
+    def update_hyp_moves(self):
+        """Updates and returns the piece's hypothetical moves dictionary. These
+        moves do not consider the locations of other pieces."""
+        #TODO: This method is the same as for the general (at this time of
+        # writing). May want to reduce repetition
+        hyp_moves = {}
+        color = self.get_piece_id()[0]  # 'b' or 'r'
+
+        # iterate through horizontal and vertical destinations
+        for next_position in [self.position_u, self.position_d,
+                              self.position_l, self.position_r]:
+
+            destination = next_position()
+            if destination is not None:
+
+                # check whether destination is in the palace
+                if destination[0] < 'd' or destination[0] > 'f':
+                    continue
+                if color == 'b' and int(destination[1:]) < 8:
+                    continue
+                if color == 'r' and int(destination[1:]) > 3:
+                    continue
+
+                hyp_moves[destination] = []  # one step so no intermediates
+
+        # diagonal destinations
+        position = self.get_position()
+        if color == 'r':
+            red_corners = {'d1', 'f1', 'd3', 'f3'}
+            red_center = 'e2'
+
+            if position in red_corners:
+                hyp_moves[red_center] = []
+            if position == red_center:
+                for corner in red_corners:
+                    hyp_moves[corner] = []
+
+        else:  # color == 'b'
+            blue_corners = {'d8', 'f8', 'd10', 'f10'}
+            blue_center = 'e9'
+
+            if position in blue_corners:
+                hyp_moves[blue_center] = []
+            if position == blue_center:
+                for corner in blue_corners:
+                    hyp_moves[corner] = []
+
+        return hyp_moves
+
 class Horse(Piece):
     """
     Represents a horse, a sub-class of Piece.
@@ -613,6 +682,9 @@ def main():
     print(hyp_moves)
     general = General('rge1', 'f2')
     hyp_moves = general.update_hyp_moves()
+    print(hyp_moves)
+    guard = Guard('rge1', 'f2')
+    hyp_moves = guard.update_hyp_moves()
     print(hyp_moves)
 
 if __name__ == '__main__':
