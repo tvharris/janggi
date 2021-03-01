@@ -300,20 +300,16 @@ class Cannon(Piece):
         # cannons can jump diagonally from the corners of the palace
         position = self.get_position()
         if position == 'd1' or position == 'd8':
-            intermediate = self.position_dr()  # center of a palace
-            destination = self.position_dr(intermediate)
-
+            next_position = self.position_dr
         if position == 'f1' or position == 'f8':
-            intermediate = self.position_dl()
-            destination = self.position_dl(intermediate)
-
+            next_position = self.position_dl
         if position == 'd3' or position == 'd10':
-            intermediate = self.position_ur()
-            destination = self.position_ur(intermediate)
-
+            next_position = self.position_ur
         if position == 'f3' or position == 'f10':
-            intermediate = self.position_ul()
-            destination = self.position_ul(intermediate)
+            next_position = self.position_ul
+
+        intermediate = next_position()  # center of a palace
+        destination = next_position(intermediate)
 
         hyp_moves[destination] = [intermediate]
 
