@@ -262,9 +262,11 @@ class Piece():
 class Cannon(Piece):
     """
     Represents a cannon, a sub-class of Piece.
+    Cannons can move horizontally or vertically any number of positions, but
+    they must jump exactly one other piece, which may not be another cannon.
 
     Data members: See __init__
-    Methods: inherited methods and update_moves
+    Methods: inherited methods and update_hyp_moves
     """
     def __init__(self, piece_id, position):
         """
@@ -297,11 +299,54 @@ class Cannon(Piece):
 
         return hyp_moves
 
+class Chariot(Piece):
+    """
+    Represents a chariot, a sub-class of Piece.
+    Chariots can move horizontally or vertically any number of positions, but
+    they may not jump over another piece.
+
+    Data members: See __init__
+    Methods: inherited methods and update_hyp_moves
+    """
+    def __init__(self, piece_id, position):
+        """
+        Creates a chariot with the data members of a Piece. The parameters are
+        set as private data members as follows:
+            piece_id: (str) 'cch#', where the first c is the color r or b
+                      and # is 1 or 2
+            position: (str) board position, e.g., 'a1'
+        """
+        super().__init__(piece_id, position)
+
+    def update_hyp_moves(self):
+        """Updates and returns the piece's hypothetical moves dictionary. These
+        moves do not consider the locations of other pieces."""
+        hyp_moves = {}
+
+        # iterate through all possible destinations, saving them with their
+        # corresponding intermediate positions as {dest.: [interm1, interm2, ...]}
+        for next_position in [self.position_u, self.position_d,
+                              self.position_l, self.position_r]:
+            # initialize the destination
+            destination = self.get_position()
+            intermediates = []
+            while next_position(destination) is not None:
+                destination = next_position(destination)
+                # add destination and its intermediates to dictionary
+                hyp_moves[destination] = list(intermediates)
+                # previous destination is intermediate of next destination
+                intermediates.append(destination)
+
+        return hyp_moves
+
 def main():
     #game = JanggiGame()
     #game.display_board()
     cannon = Cannon('bca1', 'b8')
     hyp_moves = cannon.update_hyp_moves()
+    print(hyp_moves)
+    chariot = Chariot('bch1', 'b8')
+    hyp_moves = chariot.update_hyp_moves()
     print(hyp_moves)
 
 if __name__ == '__main__':
