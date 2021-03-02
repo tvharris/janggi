@@ -357,21 +357,34 @@ class Chariot(Piece):
                 # previous destination is intermediate of next destination
                 intermediates.append(destination)
 
-        # chariots can move diagonally from the corners of the palace
+        # diagonal moves from the corners of a palace
         position = self.get_position()
+        red_corners = {'d1', 'f1', 'd3', 'f3'}
+        blue_corners = {'d8', 'f8', 'd10', 'f10'}
+        if position in red_corners or position in blue_corners:
+            if position == 'd1' or position == 'd8':
+                next_position = self.position_dr
+            if position == 'f1' or position == 'f8':
+                next_position = self.position_dl
+            if position == 'd3' or position == 'd10':
+                next_position = self.position_ur
+            if position == 'f3' or position == 'f10':
+                next_position = self.position_ul
 
-        if position == 'd1' or position == 'd8':
-            next_position = self.position_dr
-        if position == 'f1' or position == 'f8':
-            next_position = self.position_dl
-        if position == 'd3' or position == 'd10':
-            next_position = self.position_ur
-        if position == 'f3' or position == 'f10':
-            next_position = self.position_ul
+            destination = next_position()
+            hyp_moves[destination] = []  # add center of palace to dict
+            hyp_moves[next_position(destination)] = [destination]  # opp. corner
 
-        destination = next_position()
-        hyp_moves[destination] = []  # add center of palace to dict
-        hyp_moves[next_position(destination)] = [destination]  # opp. corner
+        # diagonal moves from the center of a palace
+        red_center = 'e2'
+        blue_center = 'e9'
+        if position == blue_center:
+            for corner in blue_corners:
+                hyp_moves[corner] = []
+
+        if position == red_center:
+            for corner in red_corners:
+                hyp_moves[corner] = []
 
         return hyp_moves
 
@@ -665,10 +678,10 @@ class Soldier(Piece):
 def main():
     #game = JanggiGame()
     #game.display_board()
-    cannon = Cannon('bca1', 'f3')
+    cannon = Cannon('bca1', 'd1')
     hyp_moves = cannon.update_hyp_moves()
     print(hyp_moves)
-    chariot = Chariot('bch1', 'f3')
+    chariot = Chariot('bch1', 'e2')
     hyp_moves = chariot.update_hyp_moves()
     print(hyp_moves)
     elephant = Elephant('bel1', 'e3')
