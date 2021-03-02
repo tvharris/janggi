@@ -19,8 +19,8 @@ class JanggiGame:
             in_check:
             board:
         """
-        self._board = {'a1': 'rch1', 'b1': '----', 'c1': 'rho1', 'd1': 'rgu1', 'e1': '----',
-                       'f1': 'rgu2', 'g1': 'rel2', 'h1': 'rho2', 'i1': 'rch1',
+        self._board = {'a1': 'rch1', 'b1': 'rel1', 'c1': 'rho1', 'd1': 'rgu1', 'e1': '----',
+                       'f1': 'rgu2', 'g1': 'rel2', 'h1': 'rho2', 'i1': 'rch2',
                        'a2': '----', 'b2': '----', 'c2': '----', 'd2': '----', 'e2': 'rge1',
                        'f2': '----', 'g2': '----', 'h2': '----', 'i2': '----',
                        'a3': '----', 'b3': 'rca1', 'c3': '----', 'd3': '----', 'e3': '----',
@@ -687,7 +687,7 @@ class Horse(Piece):
             self.position_d: [self.position_dl, self.position_dr],
             self.position_l: [self.position_ul, self.position_dl],
             self.position_r: [self.position_ur, self.position_dr]
-        }.items():
+            }.items():
 
             # the intermediate is adjacent
             intermediate = next_position()
@@ -786,6 +786,7 @@ def main():
     guard = Guard('rge1', 'f2')
     hyp_moves = guard.update_hyp_moves()
     print(hyp_moves)
+
 
 if __name__ == '__main__':
     main()
