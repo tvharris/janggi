@@ -154,6 +154,10 @@ class Player:
         pieces = self.get_pieces()
         pieces.remove(piece)
 
+    def set_allowed_destinations(self, allowed_destinations):
+        """Sets the Player's allowed_destinations set to the set parameter"""
+        self._allowed_destinations = allowed_destinations
+
 
 
 
