@@ -158,7 +158,30 @@ class Player:
         """Sets the Player's allowed_destinations set to the set parameter"""
         self._allowed_destinations = allowed_destinations
 
+    def _init_pieces(self):
+        """Initializes the Player's pieces in their starting positions and adds
+        them to the pieces set"""
+        color = self.get_color()
+        if color == 'blue':
+            pieces = {Soldier('bso1', 'a7'), Soldier('bso2', 'c7'),
+                      Soldier('bso3', 'e7'), Soldier('bso4', 'g7'),
+                      Soldier('bso5', 'i7'), Cannon('bca1', 'b8'),
+                      Cannon('bca2', 'h8'), General('bge1', 'e9'),
+                      Chariot('bch1', 'a10'), Elephant('bel1', 'b10'),
+                      Horse('bho1', 'c10'), Guard('bgu1', 'd10'),
+                      Guard('bgu2', 'f10'), Elephant('bel2', 'g10'),
+                      Horse('bho2', 'h10'), Chariot('bch2', 'i10')}
+        else:
+            pieces = {Soldier('rso1', 'a4'), Soldier('rso2', 'c4'),
+                      Soldier('rso3', 'e4'), Soldier('rso4', 'g4'),
+                      Soldier('rso5', 'i4'), Cannon('rca1', 'b3'),
+                      Cannon('rca2', 'h3'), General('rge1', 'e2'),
+                      Chariot('rch1', 'a1'), Elephant('rel1', 'b1'),
+                      Horse('rho1', 'c1'), Guard('rgu1', 'd1'),
+                      Guard('rgu2', 'f1'), Elephant('rel2', 'g1'),
+                      Horse('rho2', 'h1'), Chariot('rch2', 'i1')}
 
+        self._pieces = pieces
 
 
 class Piece:
