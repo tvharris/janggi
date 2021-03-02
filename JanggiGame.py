@@ -46,7 +46,7 @@ class Board:
     Data members: See __init__
     Methods: get_board, display_board
     """
-    def __init__(self, color):
+    def __init__(self):
         """
         Creates a Janggi Board.
         Private data member board: dictionary organized as
