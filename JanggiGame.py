@@ -8,26 +8,29 @@ class JanggiGame:
     An implementation of the board game Janggi.
 
     Data members: See __init__
-    Methods: get_game_state, is_in_check, make_move, display_board
+    Methods: get_game_state, is_in_check, make_move
     """
-
     def __init__(self):
         """
         Creates a JanggiGame.
         Private data members:
-            game_state:
-            in_check:
+            game_state: (str) 'UNFINISHED', 'RED_WON', or 'BLUE_WON'
+            board: Board object
+            red_player: Player object
+            blue_player: Player object
         """
+        self.game_state = 'UNFINISHED'
+        self._board = Board()
+        self._red_player = Player('red')
+        self._blue_player = Player('blue')
 
     def get_game_state(self):
         """Returns game state which may be 'UNFINISHED', 'RED_WON', or
         BLUE_WON'."""
 
-
     def is_in_check(self, player):
         """Returns True of the player ('red' or 'blue') is in check, otherwise
         False."""
-
 
     def make_move(self, from_pos, to_pos):
         """
