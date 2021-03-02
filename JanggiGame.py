@@ -391,6 +391,7 @@ class Cannon(Piece):
 
         hyp_moves[destination] = [intermediate]
 
+        self._hyp_moves = hyp_moves
         return hyp_moves
 
 
@@ -461,6 +462,7 @@ class Chariot(Piece):
             for corner in red_corners:
                 hyp_moves[corner] = []
 
+        self._hyp_moves = hyp_moves
         return hyp_moves
 
 
@@ -511,6 +513,7 @@ class Elephant(Piece):
                             hyp_moves[destination] = \
                                 [intermediate_1, intermediate_2]
 
+        self._hyp_moves = hyp_moves
         return hyp_moves
 
 
@@ -578,6 +581,7 @@ class General(Piece):
                 for corner in blue_corners:
                     hyp_moves[corner] = []
 
+        self._hyp_moves = hyp_moves
         return hyp_moves
 
 
@@ -648,6 +652,7 @@ class Guard(Piece):
                 for corner in blue_corners:
                     hyp_moves[corner] = []
 
+        self._hyp_moves = hyp_moves
         return hyp_moves
 
 
@@ -694,6 +699,7 @@ class Horse(Piece):
                     if destination is not None:
                         hyp_moves[destination] = [intermediate]
 
+        self._hyp_moves = hyp_moves
         return hyp_moves
 
 
@@ -752,6 +758,7 @@ class Soldier(Piece):
                 hyp_moves['d10'] = []
                 hyp_moves['f10'] = []
 
+        self._hyp_moves = hyp_moves
         return hyp_moves
 
 
