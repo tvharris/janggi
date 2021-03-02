@@ -13,6 +13,7 @@ class JanggiGame:
 
     def __init__(self):
         """
+        Creates a JanggiGame.
         Private data members:
             game_state:
             in_check:
@@ -111,7 +112,52 @@ class JanggiGame:
                 ))
 
 
-class Piece():
+class Player:
+    """
+    Represents a Janggi player.
+
+    Data members: See __init__
+    Methods: get_color, get_pieces, add_piece, remove_piece,
+             set_allowed_destinations, _init_pieces
+    """
+    def __init__(self, color):
+        """
+        Creates a Janggi Player and calls _init_pieces to initialize the Piece
+        objects and add them to the player's pieces set
+
+        Private data members:
+            allowed_destinations: set of destinations that the player's pieces
+                can legally reach given the current state of the board
+            color: (str) 'blue' or 'red'
+            pieces: set of Piece objects
+        """
+        self._allowed_destinations = set()
+        self._color = color
+        self._pieces = set()
+        self._init_pieces()
+
+    def get_color(self):
+        """Returns the Player's color"""
+        return self._color
+
+    def get_pieces(self):
+        """Returns the Player's set of Piece objects"""
+        return self._pieces
+
+    def add_piece(self, piece):
+        """Takes a Piece object and adds it to the Player's pieces set"""
+        pieces = self.get_pieces()
+        pieces.add(piece)
+
+    def remove_piece(self, piece):
+        """Takes a Piece object and removes it from the Player's pieces set"""
+        pieces = self.get_pieces()
+        pieces.remove(piece)
+
+
+
+
+class Piece:
     """
     Represents a Janggi piece.
 
@@ -121,7 +167,8 @@ class Piece():
         position_ul, position_ur, position_dl, position_dr
     """
     def __init__(self, piece_id, position):
-        """Creates a Janggi piece.
+        """
+        Creates a Janggi Piece.
         Private data members:
             piece_id: string with format 'cxx#' where
                 c is the color 'r' or 'b',
@@ -319,6 +366,7 @@ class Cannon(Piece):
 
         return hyp_moves
 
+
 class Chariot(Piece):
     """
     Represents a chariot, a sub-class of Piece.
@@ -438,6 +486,7 @@ class Elephant(Piece):
 
         return hyp_moves
 
+
 class General(Piece):
     """
     Represents a General, a sub-class of Piece.
@@ -503,6 +552,7 @@ class General(Piece):
                     hyp_moves[corner] = []
 
         return hyp_moves
+
 
 class Guard(Piece):
     """
@@ -573,6 +623,7 @@ class Guard(Piece):
 
         return hyp_moves
 
+
 class Horse(Piece):
     """
     Represents a horse, a sub-class of Piece.
@@ -617,6 +668,7 @@ class Horse(Piece):
                         hyp_moves[destination] = [intermediate]
 
         return hyp_moves
+
 
 class Soldier(Piece):
     """
@@ -675,6 +727,7 @@ class Soldier(Piece):
 
         return hyp_moves
 
+
 def main():
     #game = JanggiGame()
     #game.display_board()
@@ -684,10 +737,10 @@ def main():
     chariot = Chariot('bch1', 'e2')
     hyp_moves = chariot.update_hyp_moves()
     print(hyp_moves)
-    elephant = Elephant('bel1', 'e3')
+    elephant = Elephant('bel1', 'h2')
     hyp_moves = elephant.update_hyp_moves()
     print(hyp_moves)
-    horse = Horse('bho1', 'e3')
+    horse = Horse('bho1', 'i10')
     hyp_moves = horse.update_hyp_moves()
     print(hyp_moves)
     soldier = Soldier('bso1', 'e2')
