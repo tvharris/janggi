@@ -17,7 +17,42 @@ class JanggiGame:
         Private data members:
             game_state:
             in_check:
-            board:
+        """
+
+    def get_game_state(self):
+        """Returns game state which may be 'UNFINISHED', 'RED_WON', or
+        BLUE_WON'."""
+
+
+    def is_in_check(self, player):
+        """Returns True of the player ('red' or 'blue') is in check, otherwise
+        False."""
+
+
+    def make_move(self, from_pos, to_pos):
+        """
+        Moves a piece from its current position to an allowed position, and may
+        capture an opposing piece.
+        Parameters: from_pos and to_pos are strings representing positions
+            (e.g., 'b3')
+        Returns: True if the move is allowed, otherwise False.
+        """
+
+
+class Board:
+    """
+    Represents a Janggi board.
+
+    Data members: See __init__
+    Methods: get_board, display_board
+    """
+    def __init__(self, color):
+        """
+        Creates a Janggi Board.
+        Private data member board: dictionary organized as
+            {position (str): piece_id (str)} for all positions on a Janggi
+            board. The board is initialized with the pieces in their starting
+            positions for a Janggi game.
         """
         self._board = {'a1': 'rch1', 'b1': 'rel1', 'c1': 'rho1', 'd1': 'rgu1', 'e1': '----',
                        'f1': 'rgu2', 'g1': 'rel2', 'h1': 'rho2', 'i1': 'rch2',
@@ -43,25 +78,6 @@ class JanggiGame:
     def get_board(self):
         """Returns the board dictionary."""
         return self._board
-
-    def get_game_state(self):
-        """Returns game state which may be 'UNFINISHED', 'RED_WON', or
-        BLUE_WON'."""
-
-
-    def is_in_check(self, player):
-        """Returns True of the player ('red' or 'blue') is in check, otherwise
-        False."""
-
-
-    def make_move(self, from_pos, to_pos):
-        """
-        Moves a piece from its current position to an allowed position, and may
-        capture an opposing piece.
-        Parameters: from_pos and to_pos are strings representing positions
-            (e.g., 'b3')
-        Returns: True if the move is allowed, otherwise False.
-        """
 
     def display_board(self):
         """Displays the board with the pieces in their current positions."""
