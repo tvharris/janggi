@@ -21,8 +21,8 @@ class JanggiGame:
         """
         self.game_state = 'UNFINISHED'
         self._board = Board()
-        self._red_player = Player('red')
-        self._blue_player = Player('blue')
+        self._red_player = Player('red', self._board)
+        self._blue_player = Player('blue', self._board)
 
     def get_game_state(self):
         """Returns game state which may be 'UNFINISHED', 'RED_WON', or
@@ -139,7 +139,7 @@ class Player:
     Methods: get_color, get_pieces, add_piece, remove_piece,
              set_allowed_destinations, _init_pieces
     """
-    def __init__(self, color):
+    def __init__(self, color, board):
         """
         Creates a Janggi Player and calls _init_pieces to initialize the Piece
         objects and add them to the player's pieces set
@@ -149,11 +149,13 @@ class Player:
                 can legally reach given the current state of the board
             color: (str) 'blue' or 'red'
             pieces: set of Piece objects
+            board: Board object
         """
         self._allowed_destinations = set()
         self._color = color
         self._pieces = set()
         self._init_pieces()
+        self._board = board
 
     def get_color(self):
         """Returns the Player's color"""
