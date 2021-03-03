@@ -483,7 +483,9 @@ class Cannon(Piece):
 
     def update_allowed_moves(self):
         """Updates and returns the piece's allowed moves dictionary. Allowed
-        moves are legal based on the current state of the board."""
+        moves are legal based on the current state of the board. This method
+        overrides the method inherited from Piece, because cannons have special
+        rules: They must jump one piece and it can't be a cannon."""
         piece_id = self.get_piece_id()
         color = piece_id[0]
         board = self.get_board()
@@ -496,6 +498,20 @@ class Cannon(Piece):
             piece_id_at_destination = board.get_occupation(destination)
             if piece_id_at_destination is not None:
                 if piece_id_at_destination[0] == color:
+                    del allowed_moves[destination]
+
+        # prevent iterating through already eliminated moves
+        hyp_moves = allowed_moves.copy()
+
+        # eliminate moves without an occupied intermediate position
+        for destination, intermediates in hyp_moves.items():
+            for intermediate in intermediates:
+                # if there is an intermediate, proceed to the next destination
+                if board.get_occupation(intermediate) is not None:
+                    break
+                # if current intermediate position is the last one in the list,
+                # then the path has no intermediates occupied
+                elif intermediate == intermediates[-1]:
                     del allowed_moves[destination]
 
         # prevent iterating through already eliminated moves
