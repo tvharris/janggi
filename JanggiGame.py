@@ -154,8 +154,8 @@ class Player:
         self._allowed_destinations = set()
         self._color = color
         self._pieces = set()
-        self._init_pieces()
         self._board = board
+        self._init_pieces(board)
 
     def get_color(self):
         """Returns the Player's color"""
@@ -164,10 +164,6 @@ class Player:
     def get_pieces(self):
         """Returns the Player's set of Piece objects"""
         return self._pieces
-
-    def get_board(self):
-        """Returns the board"""
-        return self._board
 
     def add_piece(self, piece):
         """Takes a Piece object and adds it to the Player's pieces set"""
@@ -183,11 +179,10 @@ class Player:
         """Sets the Player's allowed_destinations set to the set parameter"""
         self._allowed_destinations = allowed_destinations
 
-    def _init_pieces(self):
+    def _init_pieces(self, board):
         """Initializes the Player's pieces in their starting positions and adds
         them to the pieces set"""
         color = self.get_color()
-        board = self.get_board()
 
         if color == 'blue':
             pieces = {Soldier('bso1', 'a7', board), Soldier('bso2', 'c7', board),
@@ -265,6 +260,10 @@ class Piece:
     def get_hyp_moves(self):
         """Returns the hyp_moves dictionary."""
         return self._hyp_moves
+
+    def get_board(self):
+        """Returns the Board object"""
+        return self._board
 
     def position_u(self, position = None):
         """Returns the position directly above the piece's current position on
