@@ -82,6 +82,15 @@ class Board:
         """Returns the board dictionary."""
         return self._board
 
+    def get_occupation(self, position):
+        """Takes a position (str) and returns the piece_id (str) of the piece
+        occupying the position, or returns None if the position is
+        unoccupied."""
+        board = self.get_board()
+        if board[position] == '----':
+            return None
+        return board[position]
+
     def display_board(self):
         """Displays the board with the pieces in their current positions."""
 
@@ -205,6 +214,10 @@ class Player:
 
         self._pieces = pieces
 
+        for piece in pieces:
+           piece.update_hyp_moves()
+           piece.update_allowed_moves()
+
 
 class Piece:
     """
@@ -261,9 +274,59 @@ class Piece:
         """Returns the hyp_moves dictionary."""
         return self._hyp_moves
 
+    def set_hyp_moves(self, hyp_moves):
+        """Sets hyp_moves to the specified dictionary"""
+        self._hyp_moves = hyp_moves
+
+    def get_allowed_moves(self):
+        """Returns the allowed_moves dictionary"""
+        return self._allowed_moves
+
+    def set_allowed_moves(self, allowed_moves):
+        """Sets allowed_moves to the specified dictionary"""
+        self._allowed_moves = allowed_moves
+
     def get_board(self):
         """Returns the Board object"""
         return self._board
+
+    def update_allowed_moves(self):
+        """Updates and returns the piece's allowed moves dictionary. Allowed
+        moves are legal based on the current state of the board."""
+        piece_id = self.get_piece_id()
+        color = piece_id[0]
+        board = self.get_board()
+        hyp_moves = self.get_hyp_moves()
+        allowed_moves = hyp_moves.copy()
+
+        # eliminate moves with the destination occupied by a piece of the same
+        # color
+        for destination in hyp_moves:
+            piece_id_at_destination = board.get_occupation(destination)
+            if piece_id_at_destination is not None:
+                if piece_id_at_destination[0] == color:
+                    del allowed_moves[destination]
+
+        # prevent iterating through already eliminated moves
+        hyp_moves = allowed_moves.copy()
+
+        # eliminate moves with an occupied intermediate position
+        for destination, intermediates in hyp_moves.items():
+            for intermediate in intermediates:
+                if board.get_occupation(intermediate) is not None:
+                    if destination in allowed_moves:  # not yet deleted
+                        del allowed_moves[destination]
+        """
+        for destination, intermediates in hyp_moves.items():
+            index = 0
+            while board.get_occupation(intermediates[index]) is None:
+                index += 1
+                if index == len(intermediates):
+                    break
+            if index < len(intermediates):
+                del allowed_moves[destination]
+        """
+        self.set_allowed_moves(allowed_moves)
 
     def position_u(self, position = None):
         """Returns the position directly above the piece's current position on
@@ -406,24 +469,25 @@ class Cannon(Piece):
                 # add destination and its intermediates to dictionary
                 hyp_moves[destination] = list(intermediates)
 
-        # cannons can jump diagonally from the corners of the palace
+        # diagonal jumps from the corners of a palace
         position = self.get_position()
-        if position == 'd1' or position == 'd8':
-            next_position = self.position_dr
-        if position == 'f1' or position == 'f8':
-            next_position = self.position_dl
-        if position == 'd3' or position == 'd10':
-            next_position = self.position_ur
-        if position == 'f3' or position == 'f10':
-            next_position = self.position_ul
+        red_corners = {'d1', 'f1', 'd3', 'f3'}
+        blue_corners = {'d8', 'f8', 'd10', 'f10'}
+        if position in red_corners or position in blue_corners:
+            if position == 'd1' or position == 'd8':
+                next_position = self.position_dr
+            if position == 'f1' or position == 'f8':
+                next_position = self.position_dl
+            if position == 'd3' or position == 'd10':
+                next_position = self.position_ur
+            if position == 'f3' or position == 'f10':
+                next_position = self.position_ul
 
-        intermediate = next_position()  # center of a palace
-        destination = next_position(intermediate)
+            intermediate = next_position()  # center of a palace
+            destination = next_position(intermediate)
+            hyp_moves[destination] = [intermediate]
 
-        hyp_moves[destination] = [intermediate]
-
-        self._hyp_moves = hyp_moves
-        return hyp_moves
+        self.set_hyp_moves(hyp_moves)
 
 
 class Chariot(Piece):
@@ -493,8 +557,7 @@ class Chariot(Piece):
             for corner in red_corners:
                 hyp_moves[corner] = []
 
-        self._hyp_moves = hyp_moves
-        return hyp_moves
+        self.set_hyp_moves(hyp_moves)
 
 
 class Elephant(Piece):
@@ -544,8 +607,7 @@ class Elephant(Piece):
                             hyp_moves[destination] = \
                                 [intermediate_1, intermediate_2]
 
-        self._hyp_moves = hyp_moves
-        return hyp_moves
+        self.set_hyp_moves(hyp_moves)
 
 
 class General(Piece):
@@ -612,8 +674,7 @@ class General(Piece):
                 for corner in blue_corners:
                     hyp_moves[corner] = []
 
-        self._hyp_moves = hyp_moves
-        return hyp_moves
+        self.set_hyp_moves(hyp_moves)
 
 
 class Guard(Piece):
@@ -683,8 +744,7 @@ class Guard(Piece):
                 for corner in blue_corners:
                     hyp_moves[corner] = []
 
-        self._hyp_moves = hyp_moves
-        return hyp_moves
+        self.set_hyp_moves(hyp_moves)
 
 
 class Horse(Piece):
@@ -730,9 +790,7 @@ class Horse(Piece):
                     if destination is not None:
                         hyp_moves[destination] = [intermediate]
 
-        self._hyp_moves = hyp_moves
-        return hyp_moves
-
+        self.set_hyp_moves(hyp_moves)
 
 class Soldier(Piece):
     """
@@ -789,8 +847,7 @@ class Soldier(Piece):
                 hyp_moves['d10'] = []
                 hyp_moves['f10'] = []
 
-        self._hyp_moves = hyp_moves
-        return hyp_moves
+        self.set_hyp_moves(hyp_moves)
 
 
 def main():
