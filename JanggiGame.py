@@ -165,6 +165,10 @@ class Player:
         """Returns the Player's set of Piece objects"""
         return self._pieces
 
+    def get_board(self):
+        """Returns the board"""
+        return self._board
+
     def add_piece(self, piece):
         """Takes a Piece object and adds it to the Player's pieces set"""
         pieces = self.get_pieces()
@@ -183,24 +187,26 @@ class Player:
         """Initializes the Player's pieces in their starting positions and adds
         them to the pieces set"""
         color = self.get_color()
+        board = self.get_board()
+
         if color == 'blue':
-            pieces = {Soldier('bso1', 'a7'), Soldier('bso2', 'c7'),
-                      Soldier('bso3', 'e7'), Soldier('bso4', 'g7'),
-                      Soldier('bso5', 'i7'), Cannon('bca1', 'b8'),
-                      Cannon('bca2', 'h8'), General('bge1', 'e9'),
-                      Chariot('bch1', 'a10'), Elephant('bel1', 'b10'),
-                      Horse('bho1', 'c10'), Guard('bgu1', 'd10'),
-                      Guard('bgu2', 'f10'), Elephant('bel2', 'g10'),
-                      Horse('bho2', 'h10'), Chariot('bch2', 'i10')}
+            pieces = {Soldier('bso1', 'a7', board), Soldier('bso2', 'c7', board),
+                      Soldier('bso3', 'e7', board), Soldier('bso4', 'g7', board),
+                      Soldier('bso5', 'i7', board), Cannon('bca1', 'b8', board),
+                      Cannon('bca2', 'h8', board), General('bge1', 'e9', board),
+                      Chariot('bch1', 'a10', board), Elephant('bel1', 'b10', board),
+                      Horse('bho1', 'c10', board), Guard('bgu1', 'd10', board),
+                      Guard('bgu2', 'f10', board), Elephant('bel2', 'g10', board),
+                      Horse('bho2', 'h10', board), Chariot('bch2', 'i10', board)}
         else:
-            pieces = {Soldier('rso1', 'a4'), Soldier('rso2', 'c4'),
-                      Soldier('rso3', 'e4'), Soldier('rso4', 'g4'),
-                      Soldier('rso5', 'i4'), Cannon('rca1', 'b3'),
-                      Cannon('rca2', 'h3'), General('rge1', 'e2'),
-                      Chariot('rch1', 'a1'), Elephant('rel1', 'b1'),
-                      Horse('rho1', 'c1'), Guard('rgu1', 'd1'),
-                      Guard('rgu2', 'f1'), Elephant('rel2', 'g1'),
-                      Horse('rho2', 'h1'), Chariot('rch2', 'i1')}
+            pieces = {Soldier('rso1', 'a4', board), Soldier('rso2', 'c4', board),
+                      Soldier('rso3', 'e4', board), Soldier('rso4', 'g4', board),
+                      Soldier('rso5', 'i4', board), Cannon('rca1', 'b3', board),
+                      Cannon('rca2', 'h3', board), General('rge1', 'e2', board),
+                      Chariot('rch1', 'a1', board), Elephant('rel1', 'b1', board),
+                      Horse('rho1', 'c1', board), Guard('rgu1', 'd1', board),
+                      Guard('rgu2', 'f1', board), Elephant('rel2', 'g1', board),
+                      Horse('rho2', 'h1', board), Chariot('rch2', 'i1', board)}
 
         self._pieces = pieces
 
@@ -214,7 +220,7 @@ class Piece:
         position_u, position_d, position_l, position_r,
         position_ul, position_ur, position_dl, position_dr
     """
-    def __init__(self, piece_id, position):
+    def __init__(self, piece_id, position, board):
         """
         Creates a Janggi Piece.
         Private data members:
@@ -232,10 +238,15 @@ class Piece:
                 positions that must be passed en route as values
                 ({dest: [interm1, interm2]}). Hypothetical moves do not consider
                 positions of other pieces.
+            allowed_moves: dictionary of moves the piece can make based on the
+                positions of all other pieces on the board. The format is the
+                same as for hyp_moves ({dest: [interm1, interm2]}).
         """
         self._piece_id = piece_id
         self._position = position
         self._hyp_moves = {}
+        self._allowed_moves = {}
+        self._board = board
 
     def get_piece_id(self):
         """Returns the piece_id"""
@@ -367,7 +378,7 @@ class Cannon(Piece):
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
     """
-    def __init__(self, piece_id, position):
+    def __init__(self, piece_id, position, board):
         """
         Creates a Cannon with the data members of a Piece. The parameters are
         set as private data members as follows:
@@ -375,7 +386,7 @@ class Cannon(Piece):
                       and # is 1 or 2
             position: (str) board position, e.g., 'a1'
         """
-        super().__init__(piece_id, position)
+        super().__init__(piece_id, position, board)
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
@@ -425,7 +436,7 @@ class Chariot(Piece):
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
     """
-    def __init__(self, piece_id, position):
+    def __init__(self, piece_id, position, board):
         """
         Creates a Chariot with the data members of a Piece. The parameters are
         set as private data members as follows:
@@ -433,7 +444,7 @@ class Chariot(Piece):
                       and # is 1 or 2
             position: (str) board position, e.g., 'a1'
         """
-        super().__init__(piece_id, position)
+        super().__init__(piece_id, position, board)
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
@@ -497,7 +508,7 @@ class Elephant(Piece):
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
     """
-    def __init__(self, piece_id, position):
+    def __init__(self, piece_id, position, board):
         """
         Creates an Elephant with the data members of a Piece. The parameters are
         set as private data members as follows:
@@ -505,7 +516,7 @@ class Elephant(Piece):
                       and # is 1 or 2
             position: (str) board position, e.g., 'a1'
         """
-        super().__init__(piece_id, position)
+        super().__init__(piece_id, position, board)
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
@@ -548,14 +559,14 @@ class General(Piece):
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
     """
-    def __init__(self, piece_id, position):
+    def __init__(self, piece_id, position, board):
         """
         Creates a General with the data members of a Piece. The parameters are
         set as private data members as follows:
             piece_id: (str) 'cge1', where the first c is the color r or b
             position: (str) board position, e.g., 'e2'
         """
-        super().__init__(piece_id, position)
+        super().__init__(piece_id, position, board)
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
@@ -616,7 +627,7 @@ class Guard(Piece):
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
     """
-    def __init__(self, piece_id, position):
+    def __init__(self, piece_id, position, board):
         """
         Creates a Guard with the data members of a Piece. The parameters are
         set as private data members as follows:
@@ -624,7 +635,7 @@ class Guard(Piece):
                       and # is 1 or 2
             position: (str) board position, e.g., 'e2'
         """
-        super().__init__(piece_id, position)
+        super().__init__(piece_id, position, board)
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
@@ -687,7 +698,7 @@ class Horse(Piece):
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
     """
-    def __init__(self, piece_id, position):
+    def __init__(self, piece_id, position, board):
         """
         Creates a Horse with the data members of a Piece. The parameters are
         set as private data members as follows:
@@ -695,7 +706,7 @@ class Horse(Piece):
                       and # is 1 or 2
             position: (str) board position, e.g., 'a1'
         """
-        super().__init__(piece_id, position)
+        super().__init__(piece_id, position, board)
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
@@ -732,7 +743,7 @@ class Soldier(Piece):
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
     """
-    def __init__(self, piece_id, position):
+    def __init__(self, piece_id, position, board):
         """
         Creates a Soldier with the data members of a Piece. The parameters are
         set as private data members as follows:
@@ -740,7 +751,7 @@ class Soldier(Piece):
                       and # is 1 or 2
             position: (str) board position, e.g., 'a1'
         """
-        super().__init__(piece_id, position)
+        super().__init__(piece_id, position, board)
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
@@ -784,8 +795,8 @@ class Soldier(Piece):
 
 
 def main():
-    #game = JanggiGame()
-    #game.display_board()
+    game = JanggiGame()
+    """
     cannon = Cannon('bca1', 'd1')
     hyp_moves = cannon.update_hyp_moves()
     print(hyp_moves)
@@ -807,7 +818,7 @@ def main():
     guard = Guard('rge1', 'f2')
     hyp_moves = guard.update_hyp_moves()
     print(hyp_moves)
-
+    """
 
 if __name__ == '__main__':
     main()
