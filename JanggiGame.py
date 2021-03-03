@@ -316,16 +316,7 @@ class Piece:
                 if board.get_occupation(intermediate) is not None:
                     if destination in allowed_moves:  # not yet deleted
                         del allowed_moves[destination]
-        """
-        for destination, intermediates in hyp_moves.items():
-            index = 0
-            while board.get_occupation(intermediates[index]) is None:
-                index += 1
-                if index == len(intermediates):
-                    break
-            if index < len(intermediates):
-                del allowed_moves[destination]
-        """
+
         self.set_allowed_moves(allowed_moves)
 
     def position_u(self, position = None):
@@ -438,7 +429,8 @@ class Cannon(Piece):
     they must jump exactly one other piece, which may not be another cannon.
 
     Data members: See __init__
-    Methods: inherited methods and update_hyp_moves
+    Methods: inherited methods, update_hyp_moves, and overriding version of
+        update_allowed_moves
     """
     def __init__(self, piece_id, position, board):
         """
@@ -488,6 +480,41 @@ class Cannon(Piece):
             hyp_moves[destination] = [intermediate]
 
         self.set_hyp_moves(hyp_moves)
+
+    def update_allowed_moves(self):
+        """Updates and returns the piece's allowed moves dictionary. Allowed
+        moves are legal based on the current state of the board."""
+        piece_id = self.get_piece_id()
+        color = piece_id[0]
+        board = self.get_board()
+        hyp_moves = self.get_hyp_moves()
+        allowed_moves = hyp_moves.copy()
+
+        # eliminate moves with the destination occupied by a piece of the same
+        # color
+        for destination in hyp_moves:
+            piece_id_at_destination = board.get_occupation(destination)
+            if piece_id_at_destination is not None:
+                if piece_id_at_destination[0] == color:
+                    del allowed_moves[destination]
+
+        # prevent iterating through already eliminated moves
+        hyp_moves = allowed_moves.copy()
+
+        # eliminate moves with >1 occupied intermediate position
+        # and those with only 1 if it is a cannon
+        for destination, intermediates in hyp_moves.items():
+            num_intermediate_pieces = 0  # initialize counter
+            for intermediate in intermediates:
+                piece_id_at_intermediate = board.get_occupation(intermediate)
+                if piece_id_at_intermediate is not None:
+                    num_intermediate_pieces += 1
+                    if piece_id_at_intermediate[1:3] == 'ca' or \
+                            num_intermediate_pieces > 1:
+                            if destination in allowed_moves:  # not yet deleted
+                                del allowed_moves[destination]
+
+        self.set_allowed_moves(allowed_moves)
 
 
 class Chariot(Piece):
