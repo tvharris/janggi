@@ -403,6 +403,7 @@ class Piece:
 
     Data members: See __init__
     Methods: get_position, set_position, get_hyp_moves, set_hyp_moves,
+        get_path_to_general, set_path_to_general,
         get piece_id, get_allowed_moves, set_allowed_moves,
         get_allowed_palace_destinations, set_allowed_palace_destinations,
         get_board, is_checking, update_allowed_moves,
@@ -459,6 +460,28 @@ class Piece:
         with a letter for the column, and number for the row (e.g., 'a1')"""
         self._position = position
 
+    def get_path_to_general(self):
+        """Returns the path_to_general set."""
+        return self._path_to_general
+
+    def set_path_to_general(self, path_to_general):
+        """Takes a set (path_to_general) and sets the path_to_general data
+        member."""
+        self._path_to_general = path_to_general
+
+    def is_checking(self, opposing_general_position):
+        """Takes the opposing general's position (str) and returns True if it
+        is an allowed destination, otherwise returns False. If True, also
+        updates the path_to_general set with the intermediate positions
+        along the move."""
+        allowed_moves = self.get_allowed_moves()
+        if opposing_general_position in allowed_moves:
+            intermediates = allowed_moves[opposing_general_position]
+            self.set_path_to_general(set(intermediates))
+            return True
+
+        return False
+
     def get_hyp_moves(self):
         """Returns the hyp_moves dictionary."""
         return self._hyp_moves
@@ -486,12 +509,6 @@ class Piece:
     def get_board(self):
         """Returns the Board object"""
         return self._board
-
-    def is_checking(self, opposing_general_position):
-        """Takes the opposing Player's general's position and returns True if
-        it is an allowed destination for this piece. Also updates the
-        piece's path_to_general set."""
-        pass
 
     def update_allowed_palace_destinations(self):
         """Updates the piece's set of allowed_palace_destinations. These are
