@@ -460,7 +460,7 @@ class Piece:
                         del allowed_moves[destination]
 
         # find intersection of allowed_moves and the opposing player's palace
-        if color = 'red':
+        if color == 'red':
             allowed_palace_destinations = set(allowed_moves) & blue_palace
         else:
             allowed_palace_destinations = set(allowed_moves) & red_palace
