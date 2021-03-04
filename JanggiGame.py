@@ -105,7 +105,8 @@ class Board:
     what Piece is in a given position.
 
     Data members: See __init__
-    Methods: get_board, display_board
+    Methods: get_general_position, set_general_position, move_piece, get_board,
+        display_board, get_occupation, set_occupation
     """
     def __init__(self):
         """
@@ -165,6 +166,42 @@ class Board:
         if board[position] == '----':
             return None
         return board[position]
+
+    def set_occupation(self, piece_id, position):
+        """Takes a piece_id (str) and a position (str) and updates the board
+        dictionary."""
+        self._board[position] = piece_id
+
+    def clear_position(self, position):
+        """Takes a position (str) and clears it by setting its value in the
+        board dictionary to '----'."""
+        self.set_occupation('----', position)
+
+    def move_piece(self, from_pos, to_pos):
+        """
+        Takes positions (str) to move a piece from and to, and updates the
+        board. If the piece that is moving is a general, updates the
+        general_position dictionary.
+        Returns the piece_id (str) of a captured piece, or None if the
+        destination was unoccupied.
+        """
+        moving_piece_id = self.get_occupation(from_pos)
+        captured_piece_id = self.get_occupation(to_pos)  # None if no capture
+
+        # if moving piece is a general update its position in the
+        # general_position dictionary
+        if moving_piece_id[1:3] == 'ge':
+            if moving_piece_id[0] == 'r':
+                color = 'red'
+            else:
+                color = 'blue'
+            self.set_general_position(color, to_pos)
+
+        # update the board
+        self.clear_position(from_pos)
+        self.set_occupation(moving_piece_id, to_pos)
+
+        return captured_piece_id
 
     def display_board(self):
         """Displays the board with the pieces in their current positions."""
