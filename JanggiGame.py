@@ -293,14 +293,19 @@ class Player:
         """
         pieces = self.get_pieces()
         allowed_destinations = set()
+        allowed_palace_destinations = set()
 
         for piece in pieces:
             piece.update_hyp_moves()
             piece.update_allowed_moves()
+            piece.update_allowed_palace_destinations()
+
+            # add the piece's destinations to the player's sets
             allowed_destinations |= set(piece.get_allowed_moves())
+            allowed_palace_destinations |= piece.get_allowed_palace_destinations()
 
         self.set_allowed_destinations(allowed_destinations)
-        self.set_allowed_palace_destinations()
+        self.set_allowed_palace_destinations(allowed_palace_destinations)
 
     def _init_pieces(self, board):
         """Initializes the Player's pieces in their starting positions and adds
@@ -418,7 +423,7 @@ class Piece:
 
     def get_allowed_palace_destinations(self):
         """Returns the allowed_palace_destinations set"""
-        return self._allowed_destinations
+        return self._allowed_palace_destinations
 
     def set_allowed_palace_destinations(self, allowed_palace_destinations):
         """Sets the Player's allowed_destinations set to the set parameter"""
