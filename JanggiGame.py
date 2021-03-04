@@ -5,7 +5,14 @@
 
 class JanggiGame:
     """
-    An implementation of the board game Janggi.
+    An implementation of the board game Janggi. Has two Player objects and
+    a Board object that it initializes to start the game. The game is played
+    by using this class's make_move method. This class keeps track of the turn,
+    whether the generals are in check, and determines if the game is over. It
+    must interact with the Board and the Player to determine where the pieces
+    are and what their allowed moves are. It also communicates with the Player's
+    General objects because it needs to pass information from the opposing
+    Player to the General, which would not be available to the General.
 
     Data members: See __init__
     Methods: get_game_state, set_game_state, get_turn, next_turn, is_in_check,
@@ -92,6 +99,10 @@ class JanggiGame:
 class Board:
     """
     Represents a Janggi board.
+    This class keeps track of the positions of all pieces and can be used to
+    print the board. This class is created by the JanggiGame and is passed to
+    the Player's and the Pieces because they all need access in order to see
+    what Piece is in a given position.
 
     Data members: See __init__
     Methods: get_board, display_board
@@ -190,10 +201,20 @@ class Board:
 class Player:
     """
     Represents a Janggi player.
+    There are two Players in the game. They each have a set of Piece objects
+    which they initialize in their starting positions. The Player has a method
+    to make all of its Pieces update their data members based on the current
+    state of the board. The Player keeps sets of allowed_destinations which
+    are used by the JanggiGame and the opposing Player's General to determine
+    whether they are in check or checkmate. The Player is passed the Board
+    from the JanggiGame so that it can pass it on to the Pieces which need
+    it to determine whether positions are occupied.
 
     Data members: See __init__
-    Methods: get_color, get_pieces, add_piece, remove_piece,
-             set_allowed_destinations, _init_pieces
+    Methods: get_color, get_pieces, get_pieces_checking, set_pieces_checking,
+        get_allowed_destinations, set_allowed_destinations,
+        get_allowed_palace_destinations, set_allowed_palace_destinations,
+        add_piece, remove_piece, update_pieces, _init_pieces
     """
     def __init__(self, color, board):
         """
@@ -248,9 +269,21 @@ class Player:
         pieces = self.get_pieces()
         pieces.remove(piece)
 
+    def get_allowed_destinations(self):
+        """Returns the allowed_destinations set"""
+        return self._allowed_destinations
+
     def set_allowed_destinations(self, allowed_destinations):
         """Sets the Player's allowed_destinations set to the set parameter"""
         self._allowed_destinations = allowed_destinations
+
+    def get_allowed_palace_destinations(self):
+        """Returns the allowed_palace_destinations set"""
+        return self._allowed_destinations
+
+    def set_allowed_palace_destinations(self, allowed_palace_destinations):
+        """Sets the Player's allowed_destinations set to the set parameter"""
+        self._allowed_palace_destinations = allowed_palace_destinations
 
     def update_pieces(self):
         """
@@ -294,9 +327,17 @@ class Player:
 class Piece:
     """
     Represents a Janggi piece.
+    This is the parent class of each type of Janggi piece. They inherit all
+    the methods and data members of this class. Pieces have methods to determine
+    their allowed moves based on the current state of the board. Thus, they
+    need to have access to the Board object, but their methods are called by
+    Player objects and themselves.
 
     Data members: See __init__
-    Methods: get_position, set_position, get_hyp_moves, get piece_id
+    Methods: get_position, set_position, get_hyp_moves, set_hyp_moves,
+        get piece_id, get_allowed_moves, set_allowed_moves,
+        get_allowed_palace_destinations, set_allowed_palace_destinations,
+        get_board, is_checking, update_allowed_moves,
         position_u, position_d, position_l, position_r,
         position_ul, position_ur, position_dl, position_dr
     """
@@ -321,12 +362,20 @@ class Piece:
             allowed_moves: dictionary of moves the piece can make based on the
                 positions of all other pieces on the board. The format is the
                 same as for hyp_moves ({dest: [interm1, interm2]}).
+            allowed_palace_destinations = set of destinations in the opponent's
+                palace that can be reached in a legal move or one that would
+                be legal except it is occupied by a piece that belongs to the
+                player
+            path_to_general = set of intermediate positions along the allowed
+                path from the piece to the opposing general
         """
         self._piece_id = piece_id
         self._position = position
         self._hyp_moves = {}
         self._allowed_moves = {}
+        self._allowed_palace_destinations = set()
         self._board = board
+        self._path_to_general = set()
 
     def get_piece_id(self):
         """Returns the piece_id"""
@@ -358,13 +407,28 @@ class Piece:
         """Sets allowed_moves to the specified dictionary"""
         self._allowed_moves = allowed_moves
 
+    def get_allowed_palace_destinations(self):
+        """Returns the allowed_palace_destinations set"""
+        return self._allowed_destinations
+
+    def set_allowed_palace_destinations(self, allowed_palace_destinations):
+        """Sets the Player's allowed_destinations set to the set parameter"""
+        self._allowed_palace_destinations = allowed_palace_destinations
+
     def get_board(self):
         """Returns the Board object"""
         return self._board
 
+    def is_checking(self, opposing_general_position):
+        """Takes the opposing Player's general's position and returns True if
+        it is an allowed destination for this piece. Also updates the
+        piece's path_to_general set."""
+        pass
+
     def update_allowed_moves(self):
         """Updates and returns the piece's allowed moves dictionary. Allowed
-        moves are legal based on the current state of the board."""
+        moves are legal based on the current state of the board. TODO: also
+        updates the allowed_palace_destinations"""
         piece_id = self.get_piece_id()
         color = piece_id[0]
         board = self.get_board()
