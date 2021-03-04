@@ -283,7 +283,7 @@ class Player:
                 be legal except it is occupied by a piece that belongs to the
                 player
             color: (str) 'blue' or 'red'
-            pieces: set of Piece objects
+            pieces: dictionary with piece_id as keys and Piece objects as values
             pieces_checking: set of Piece objects that have the opposing general
                 in check
             board: Board object
@@ -291,7 +291,7 @@ class Player:
         self._allowed_destinations = set()
         self._allowed_palace_destinations = set()
         self._color = color
-        self._pieces = set()
+        self._pieces = {}
         self._pieces_checking = set()
         self._board = board
         self._init_pieces(board)
@@ -301,7 +301,7 @@ class Player:
         return self._color
 
     def get_pieces(self):
-        """Returns the Player's set of Piece objects"""
+        """Returns the Player's pieces dictionary"""
         return self._pieces
 
     def get_pieces_checking(self):
@@ -313,15 +313,31 @@ class Player:
         """Sets the Player's pieces_checking to the set parameter"""
         self._pieces_checking = pieces_checking
 
-    def add_piece(self, piece):
-        """Takes a Piece object and adds it to the Player's pieces set"""
+    def add_piece(self, piece_id, position):
+        """Takes a piece_id (str) and a position (str) and adds the piece_id and
+        corresponding Piece object to the Player's pieces dictionary. The Piece
+        is initialized with the given piece_id and position."""
         pieces = self.get_pieces()
-        pieces.add(piece)
+        board = self.get_board()
 
-    def remove_piece(self, piece):
-        """Takes a Piece object and removes it from the Player's pieces set"""
+        if piece_id[1:3] == 'ca':
+            pieces[piece_id] = Cannon(piece_id, position, board)
+        elif piece_id[1:3] == 'ch':
+            pieces[piece_id] = Chariot(piece_id, position, board)
+        elif piece_id[1:3] == 'el':
+            pieces[piece_id] = Elephant(piece_id, position, board)
+        elif piece_id[1:3] == 'gu':
+            pieces[piece_id] = Guard(piece_id, position, board)
+        elif piece_id[1:3] == 'ho':
+            pieces[piece_id] = Horse(piece_id, position, board)
+        elif piece_id[1:3] == 'so':
+            pieces[piece_id] = Soldier(piece_id, position, board)
+
+    def remove_piece(self, piece_id):
+        """Takes a piece_id and removes it from the Player's pieces dictionary
+        along with the corresponding Piece object"""
         pieces = self.get_pieces()
-        pieces.remove(piece)
+        del pieces[piece_id]
 
     def get_allowed_destinations(self):
         """Returns the allowed_destinations set"""
@@ -349,7 +365,7 @@ class Player:
         members reflect the current state of the board, and updates the Player's
         pieces_checking, allowed_destinations, and allowed_palace destinations
         """
-        pieces = self.get_pieces()
+        pieces = self.get_pieces().values()  # pieces is now a list of objects
         allowed_destinations = set()
         allowed_palace_destinations = set()
         pieces_checking = set()
@@ -378,31 +394,31 @@ class Player:
 
     def _init_pieces(self, board):
         """Initializes the Player's pieces in their starting positions and adds
-        them to the pieces set"""
+        them to the pieces dictionary."""
         color = self.get_color()
 
         if color == 'blue':
-            pieces = {Soldier('bso1', 'a7', board), Soldier('bso2', 'c7', board),
-                      Soldier('bso3', 'e7', board), Soldier('bso4', 'g7', board),
-                      Soldier('bso5', 'i7', board), Cannon('bca1', 'b8', board),
-                      Cannon('bca2', 'h8', board), General('bge1', 'e9', board),
-                      Chariot('bch1', 'a10', board), Elephant('bel1', 'b10', board),
-                      Horse('bho1', 'c10', board), Guard('bgu1', 'd10', board),
-                      Guard('bgu2', 'f10', board), Elephant('bel2', 'g10', board),
-                      Horse('bho2', 'h10', board), Chariot('bch2', 'i10', board)}
+            pieces = {'bso1': Soldier('bso1', 'a7', board), 'bso2': Soldier('bso2', 'c7', board),
+                      'bso3': Soldier('bso3', 'e7', board), 'bso4': Soldier('bso4', 'g7', board),
+                      'bso5': Soldier('bso5', 'i7', board), 'bca1': Cannon('bca1', 'b8', board),
+                      'bca2': Cannon('bca2', 'h8', board), 'bge1': General('bge1', 'e9', board),
+                      'bch1': Chariot('bch1', 'a10', board), 'bel1': Elephant('bel1', 'b10', board),
+                      'bho1': Horse('bho1', 'c10', board), 'bgu1': Guard('bgu1', 'd10', board),
+                      'bgu2': Guard('bgu2', 'f10', board), 'bel2': Elephant('bel2', 'g10', board),
+                      'bho2': Horse('bho2', 'h10', board), 'bch2': Chariot('bch2', 'i10', board)}
         else:
-            pieces = {Soldier('rso1', 'a4', board), Soldier('rso2', 'c4', board),
-                      Soldier('rso3', 'e4', board), Soldier('rso4', 'g4', board),
-                      Soldier('rso5', 'i4', board), Cannon('rca1', 'b3', board),
-                      Cannon('rca2', 'h3', board), General('rge1', 'e2', board),
-                      Chariot('rch1', 'a1', board), Elephant('rel1', 'b1', board),
-                      Horse('rho1', 'c1', board), Guard('rgu1', 'd1', board),
-                      Guard('rgu2', 'f1', board), Elephant('rel2', 'g1', board),
-                      Horse('rho2', 'h1', board), Chariot('rch2', 'i1', board)}
+            pieces = {'rso1': Soldier('rso1', 'a4', board), 'rso2': Soldier('rso2', 'c4', board),
+                      'rso3': Soldier('rso3', 'e4', board), 'rso4': Soldier('rso4', 'g4', board),
+                      'rso5': Soldier('rso5', 'i4', board), 'rca1': Cannon('rca1', 'b3', board),
+                      'rca2': Cannon('rca2', 'h3', board), 'rge1': General('rge1', 'e2', board),
+                      'rch1': Chariot('rch1', 'a1', board), 'rel1': Elephant('rel1', 'b1', board),
+                      'rho1': Horse('rho1', 'c1', board), 'rgu1': Guard('rgu1', 'd1', board),
+                      'rgu2': Guard('rgu2', 'f1', board), 'rel2': Elephant('rel2', 'g1', board),
+                      'rho2': Horse('rho2', 'h1', board), 'rch2': Chariot('rch2', 'i1', board)}
 
         self._pieces = pieces
 
-        for piece in pieces:
+        for piece in pieces.values():
            piece.update_hyp_moves()
            piece.update_allowed_moves()
 
