@@ -8,7 +8,8 @@ class JanggiGame:
     An implementation of the board game Janggi.
 
     Data members: See __init__
-    Methods: get_game_state, is_in_check, make_move
+    Methods: get_game_state, set_game_state, get_turn, next_turn, is_in_check,
+    is_checkmate, make_move, undo_move, update_generals
     """
     def __init__(self):
         """
@@ -19,28 +20,74 @@ class JanggiGame:
             red_player: Player object
             blue_player: Player object
         """
-        self.game_state = 'UNFINISHED'
+        self._game_state = 'UNFINISHED'
+        self._turn = 'blue'
         self._board = Board()
         self._red_player = Player('red', self._board)
         self._blue_player = Player('blue', self._board)
 
+    def get_turn(self):
+        """Returns the turn (str), which may be 'blue' or 'red' depending on
+        which player's turn it is."""
+        return self._turn
+
+    def next_turn(self):
+        """If the turn is 'blue', sets the turn to 'red' (str), and vice
+        versa."""
+
     def get_game_state(self):
-        """Returns game state which may be 'UNFINISHED', 'RED_WON', or
+        """Returns game state (str) which may be 'UNFINISHED', 'RED_WON', or
         BLUE_WON'."""
+        return self._game_state
+
+    def set_game_state(self, game_state):
+        """Sets the game state to the specified game_state (str)."""
 
     def is_in_check(self, player):
-        """Returns True of the player ('red' or 'blue') is in check, otherwise
-        False."""
+        """Returns True if the player ('red' or 'blue') is in check, otherwise
+        False. In check means the general could be captured by the opponent on
+        their next move."""
+        pass
+
+    def is_checkmate(self):
+        """
+        Returns True if the player whose turn it is has their opponent in
+        checkmate (i.e., if the player has won the game), otherwise returns
+        False. Checkmate is when the opponent's general is in check and would
+        not be able to get out of it on their next move because the general has
+        no allowed moves, or there are no moves that can block or capture the
+        piece(s) that has the general in check.
+        """
+        pass
 
     def make_move(self, from_pos, to_pos):
         """
         Moves a piece from its current position to an allowed position, and may
-        capture an opposing piece.
+        capture an opposing piece. The piece being moved must belong to the
+        player whose turn it is and it must not result in the player putting
+        themself in check. Determines if the move results in checkmate and
+        updates the game_state, board, players, and pieces before updating
+        the turn.
+
         Parameters: from_pos and to_pos are strings representing positions
             (e.g., 'b3')
         Returns: True if the move is allowed, otherwise False.
         """
+        pass
 
+    def undo_move(self, original_from_pos, original_to_pos, captured_piece=None):
+        """
+        Reverts the latest move that was from the original_from_pos to the
+        original_to_pos (str positions). The piece in the original_to_pos is
+        moved back and the captured_piece (Piece object) is initialized,
+        placed on the board where it was before, and added back to its player.
+        """
+        pass
+
+    def update_generals(self):
+        """Updates each general's allowed_moves based on the current state of
+        the board. Does not allow moves that put the general in check."""
+        pass
 
 class Board:
     """
