@@ -110,11 +110,13 @@ class Board:
     def __init__(self):
         """
         Creates a Janggi Board.
-        Private data member board: dictionary organized as
-            {position (str): piece_id (str)} for all positions on a Janggi
-            board. The board is initialized with the pieces in their starting
-            positions for a Janggi game.
+        Private data member:
+            board: dictionary organized as {position (str): piece_id (str)} for
+                all positions on a Janggi board. The board is initialized with
+                the pieces in their starting positions for a Janggi game.
+            general_position: dictionary organized as {color (str): position (str)}
         """
+        self._general_position = {'red': 'e2', 'blue': 'e9'}
         self._board = {'a1': 'rch1', 'b1': 'rel1', 'c1': 'rho1', 'd1': 'rgu1', 'e1': '----',
                        'f1': 'rgu2', 'g1': 'rel2', 'h1': 'rho2', 'i1': 'rch2',
                        'a2': '----', 'b2': '----', 'c2': '----', 'd2': '----', 'e2': 'rge1',
@@ -135,6 +137,21 @@ class Board:
                        'f9': '----', 'g9': '----', 'h9': '----', 'i9': '----',
                        'a10': 'bch1', 'b10': 'bel1', 'c10': 'bho1', 'd10': 'bgu1', 'e10': '----',
                        'f10': 'bgu2', 'g10': 'bel2', 'h10': 'bho2', 'i10': 'bch2'}
+
+    def get_general_position(self, color):
+        """Takes a color (str 'red' or 'blue') and returns the position of
+        the corresponding general."""
+        if color == 'red':
+            return self._general_position['red']
+        return self._general_position['blue']
+
+    def set_general_position(self, color, position):
+        """Takes a position (str) and a color (str 'red' or 'blue') of a general
+        and updates the general_position dictionary."""
+        if color == 'red':
+            self._general_position['red'] = position
+        else:
+            self._general_position['blue'] = position
 
     def get_board(self):
         """Returns the board dictionary."""
