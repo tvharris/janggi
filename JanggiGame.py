@@ -203,13 +203,21 @@ class Player:
         Private data members:
             allowed_destinations: set of destinations that the player's pieces
                 can legally reach given the current state of the board
+            allowed_palace_destinations = set of destinations in the opponent's
+                palace that can be reached in a legal move or one that would
+                be legal except it is occupied by a piece that belongs to the
+                player
             color: (str) 'blue' or 'red'
             pieces: set of Piece objects
+            pieces_checking: set of Piece objects that have the opposing general
+                in check
             board: Board object
         """
         self._allowed_destinations = set()
+        self._allowed_palace_destinations = set()
         self._color = color
         self._pieces = set()
+        self._pieces_checking = set()
         self._board = board
         self._init_pieces(board)
 
@@ -220,6 +228,15 @@ class Player:
     def get_pieces(self):
         """Returns the Player's set of Piece objects"""
         return self._pieces
+
+    def get_pieces_checking(self):
+        """Returns the Player's set of Piece objects with the opponent's general
+         in check"""
+        return self._pieces_checking
+
+    def set_pieces_checking(self, pieces_checking):
+        """Sets the Player's pieces_checking to the set parameter"""
+        self._pieces_checking = pieces_checking
 
     def add_piece(self, piece):
         """Takes a Piece object and adds it to the Player's pieces set"""
@@ -234,6 +251,14 @@ class Player:
     def set_allowed_destinations(self, allowed_destinations):
         """Sets the Player's allowed_destinations set to the set parameter"""
         self._allowed_destinations = allowed_destinations
+
+    def update_pieces(self):
+        """
+        Updates each of the Player's pieces so that all of their data
+        members reflect the current state of the board, and updates the Player's
+        pieces_checking, allowed_destinations, and allowed_palace destinations
+        """
+        pass
 
     def _init_pieces(self, board):
         """Initializes the Player's pieces in their starting positions and adds
