@@ -339,6 +339,10 @@ class Player:
         """Sets the Player's allowed_destinations set to the set parameter"""
         self._allowed_palace_destinations = allowed_palace_destinations
 
+    def get_board(self):
+        """Returns the Board object."""
+        return self._board
+
     def update_pieces(self):
         """
         Updates each of the Player's pieces so that all of their data
@@ -348,6 +352,11 @@ class Player:
         pieces = self.get_pieces()
         allowed_destinations = set()
         allowed_palace_destinations = set()
+        pieces_checking = set()
+
+        color = self.get_color()
+        board = self.get_board()
+        opposing_general_position = board.get_general_position(color)
 
         for piece in pieces:
             piece.update_hyp_moves()
@@ -358,8 +367,14 @@ class Player:
             allowed_destinations |= set(piece.get_allowed_moves())
             allowed_palace_destinations |= piece.get_allowed_palace_destinations()
 
+            # determine if the piece has the opposing general in check and
+            # add it to the Player's pieces_checking if so
+            if piece.is_checking(opposing_general_position):
+                pieces_checking.add(piece)
+
         self.set_allowed_destinations(allowed_destinations)
         self.set_allowed_palace_destinations(allowed_palace_destinations)
+        self.set_pieces_checking(pieces_checking)
 
     def _init_pieces(self, board):
         """Initializes the Player's pieces in their starting positions and adds
@@ -531,7 +546,7 @@ class Piece:
                         del allowed_moves[destination]
 
         # find intersection of allowed_moves and the opposing player's palace
-        if color == 'red':
+        if color == 'r':
             allowed_palace_destinations = set(allowed_moves) & blue_palace
         else:
             allowed_palace_destinations = set(allowed_moves) & red_palace
@@ -1143,6 +1158,7 @@ class Soldier(Piece):
 
 def main():
     game = JanggiGame()
+    game._red_player.update_pieces()
     """
     cannon = Cannon('bca1', 'd1')
     hyp_moves = cannon.update_hyp_moves()
