@@ -434,10 +434,37 @@ class Piece:
         piece's path_to_general set."""
         pass
 
+    def update_allowed_palace_destinations(self):
+        """Updates the piece's set of allowed_palace_destinations. These are
+        positions in the opposing palace that the piece can move to, including
+        those that are occupied by a piece of the same color."""
+        piece_id = self.get_piece_id()
+        color = piece_id[0]
+        board = self.get_board()
+        hyp_moves = self.get_hyp_moves()
+        allowed_moves = hyp_moves.copy()
+
+        red_palace = {'d1', 'e1', 'f1', 'd2', 'e2', 'f2', 'd3', 'e3', 'f3'}
+        blue_palace = {'d8', 'e8', 'f8', 'd9', 'e9', 'f9', 'd10', 'e10', 'f10'}
+
+        # eliminate moves with an occupied intermediate position
+        for destination, intermediates in hyp_moves.items():
+            for intermediate in intermediates:
+                if board.get_occupation(intermediate) is not None:
+                    if destination in allowed_moves:  # not yet deleted
+                        del allowed_moves[destination]
+
+        # find intersection of allowed_moves and the opposing player's palace
+        if color = 'red':
+            allowed_palace_destinations = set(allowed_moves) & blue_palace
+        else:
+            allowed_palace_destinations = set(allowed_moves) & red_palace
+
+        self.set_allowed_palace_destinations(allowed_palace_destinations)
+
     def update_allowed_moves(self):
-        """Updates and returns the piece's allowed moves dictionary. Allowed
-        moves are legal based on the current state of the board. TODO: also
-        updates the allowed_palace_destinations"""
+        """Updates the piece's allowed moves dictionary. Allowed moves are legal
+         based on the current state of the board."""
         piece_id = self.get_piece_id()
         color = piece_id[0]
         board = self.get_board()
