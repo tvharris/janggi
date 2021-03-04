@@ -291,7 +291,16 @@ class Player:
         members reflect the current state of the board, and updates the Player's
         pieces_checking, allowed_destinations, and allowed_palace destinations
         """
-        pass
+        pieces = self.get_pieces()
+        allowed_destinations = set()
+
+        for piece in pieces:
+            piece.update_hyp_moves()
+            piece.update_allowed_moves()
+            allowed_destinations |= set(piece.get_allowed_moves())
+
+        self.set_allowed_destinations(allowed_destinations)
+        self.set_allowed_palace_destinations()
 
     def _init_pieces(self, board):
         """Initializes the Player's pieces in their starting positions and adds
