@@ -16,7 +16,7 @@ class JanggiGame:
 
     Data members: See __init__
     Methods: get_game_state, set_game_state, get_turn, next_turn, is_in_check,
-    is_checkmate, make_move, undo_move, update_generals
+    is_checkmate, make_move, undo_move, update_generals, get_current_player
     """
     def __init__(self):
         """
@@ -59,6 +59,12 @@ class JanggiGame:
         """Returns the Player object for the blue player."""
         return self._blue_player
 
+    def get_current_player(self):
+        """Returns the Player object for the player whose turn it is."""
+        if self.get_turn() == 'red':
+            return self.get_red_player()
+        return self.get_blue_player()
+
     def get_game_state(self):
         """Returns game state (str) which may be 'UNFINISHED', 'RED_WON', or
         BLUE_WON'."""
@@ -66,6 +72,7 @@ class JanggiGame:
 
     def set_game_state(self, game_state):
         """Sets the game state to the specified game_state (str)."""
+        self._game_state = game_state
 
     def is_in_check(self, player):
         """Returns True if the player ('red' or 'blue') is in check, otherwise
