@@ -67,7 +67,7 @@ class JanggiGame:
 
     def get_opponent(self):
         """Returns the Player object for the player whose turn it is not."""
-        if self.get_turn() = 'red':
+        if self.get_turn() == 'red':
             return self.get_blue_player()
         return self.get_red_player()
 
@@ -89,7 +89,7 @@ class JanggiGame:
         else:
             opponent = self.get_red_player()
 
-        if opponent.get_pieces_checking() is not None:
+        if opponent.get_pieces_checking() != []:
             return True
         return False
 
@@ -102,9 +102,6 @@ class JanggiGame:
         #    return True
         #return False
 
-
-
-
     def is_checkmate(self):
         """
         Returns True if the player whose turn it is has their opponent in
@@ -114,7 +111,37 @@ class JanggiGame:
         no allowed moves, or there are no moves that can block or capture the
         piece(s) that has the general in check.
         """
-        pass
+        current_player = self.get_current_player()
+        pieces_checking = current_player.get_pieces_checking()
+
+        opponent = self.get_opponent()
+        opponent_color = opponent.get_color()
+        opponent_allowed_destinations = opponent.get_allowed_destinations()
+
+        if opponent_color == 'red':
+            general = opponent.get_pieces()['rge1']
+        else:
+            general = opponent.get_color()['bge1']
+
+        # if general has an allowed move it can get out of check
+        if general.get_allowed_moves() != []:
+            return False
+
+        # check whether only one piece has the general in check
+        if len(pieces_checking) == 1:
+
+            # if it can be captured, it's not a checkmate
+            if pieces_checking[0].get_position() in opponent_allowed_destinations:
+                return False
+
+            # if the piece is a cannon, check whether it is jumping an
+            # opponent's piece. If that piece can be moved, the cannon no
+            # longer has the general in check
+
+
+
+
+
 
     def make_move(self, from_pos, to_pos):
         """
@@ -359,7 +386,7 @@ class Player:
                 player
             color: (str) 'blue' or 'red'
             pieces: dictionary with piece_id as keys and Piece objects as values
-            pieces_checking: set of Piece objects that have the opposing general
+            pieces_checking: list of Piece objects that have the opposing general
                 in check
             board: Board object
         """
@@ -367,7 +394,7 @@ class Player:
         self._allowed_palace_destinations = set()
         self._color = color
         self._pieces = {}
-        self._pieces_checking = set()
+        self._pieces_checking = []
         self._board = board
         self._init_pieces(board)
 
@@ -380,12 +407,12 @@ class Player:
         return self._pieces
 
     def get_pieces_checking(self):
-        """Returns the Player's set of Piece objects with the opponent's general
-         in check"""
+        """Returns the Player's list of Piece objects with the opponent's
+        general in check"""
         return self._pieces_checking
 
     def set_pieces_checking(self, pieces_checking):
-        """Sets the Player's pieces_checking to the set parameter"""
+        """Sets the Player's pieces_checking to the list parameter"""
         self._pieces_checking = pieces_checking
 
     def add_piece(self, piece_id, position):
@@ -443,7 +470,7 @@ class Player:
         pieces = self.get_pieces().values()  # pieces is now a list of objects
         allowed_destinations = set()
         allowed_palace_destinations = set()
-        pieces_checking = set()
+        pieces_checking = []
 
         color = self.get_color()
         board = self.get_board()
@@ -461,7 +488,7 @@ class Player:
             # if the piece has the opposing general in check add it to the
             # Player's pieces_checking
             if piece.is_checking(opposing_general_position):
-                pieces_checking.add(piece)
+                pieces_checking.append(piece))
 
         self.set_allowed_destinations(allowed_destinations)
         self.set_allowed_palace_destinations(allowed_palace_destinations)
