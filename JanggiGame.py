@@ -200,6 +200,7 @@ class JanggiGame:
         # determine whether the general is being moved
         board = self.get_board()
         current_player = self.get_current_player()
+        general_moving = False
 
         if color == 'red':
             general = current_player.get_pieces()['rge1']
@@ -207,10 +208,9 @@ class JanggiGame:
             general = current_player.get_pieces()['bge1']
 
         piece_id = board.get_occupation(from_pos)
+
         if piece_id[1:3] == 'ge':
             general_moving = True
-        else:
-            general_moving = False
 
             # determine whether the general's move is allowed
             if to_pos not in general.get_allowed_moves():
@@ -220,6 +220,10 @@ class JanggiGame:
         # determine if the move is allowed for other pieces
         # this already will deny moves to positions occupied by a piece of the
         # same color
+        if piece_id not in current_player.get_pieces():
+            print("The piece belongs to the other player.")
+            return False
+
         if to_pos not in current_player.get_allowed_destinations():
             print("The piece can't move to that position.")
             return False
@@ -333,6 +337,7 @@ class JanggiGame:
                         del allowed_moves[destination]
 
             general.set_allowed_moves(allowed_moves)
+
 
 class Board:
     """
@@ -655,10 +660,14 @@ class Player:
                       'rho2': Horse('rho2', 'h1', board), 'rch2': Chariot('rch2', 'i1', board)}
 
         self._pieces = pieces
+        allowed_destinations = set()
 
         for piece in pieces.values():
-           piece.update_hyp_moves()
-           piece.update_allowed_moves()
+            piece.update_hyp_moves()
+            piece.update_allowed_moves()
+            allowed_destinations |= set(piece.get_allowed_moves())
+
+        self.set_allowed_destinations(allowed_destinations)
 
 
 class Piece:
@@ -1371,6 +1380,7 @@ class Horse(Piece):
 
         self.set_hyp_moves(hyp_moves)
 
+
 class Soldier(Piece):
     """
     Represents a soldier, a sub-class of Piece.
@@ -1430,30 +1440,18 @@ class Soldier(Piece):
 
 
 def main():
+    """Lets users play the game."""
     game = JanggiGame()
-    game._red_player.update_pieces()
+    game.make_move('d1', 'd1')
+    game.make_move('d1', 'e1')
     """
-    cannon = Cannon('bca1', 'd1')
-    hyp_moves = cannon.update_hyp_moves()
-    print(hyp_moves)
-    chariot = Chariot('bch1', 'e2')
-    hyp_moves = chariot.update_hyp_moves()
-    print(hyp_moves)
-    elephant = Elephant('bel1', 'h2')
-    hyp_moves = elephant.update_hyp_moves()
-    print(hyp_moves)
-    horse = Horse('bho1', 'i10')
-    hyp_moves = horse.update_hyp_moves()
-    print(hyp_moves)
-    soldier = Soldier('bso1', 'e2')
-    hyp_moves = soldier.update_hyp_moves()
-    print(hyp_moves)
-    general = General('rge1', 'f2')
-    hyp_moves = general.update_hyp_moves()
-    print(hyp_moves)
-    guard = Guard('rge1', 'f2')
-    hyp_moves = guard.update_hyp_moves()
-    print(hyp_moves)
+    board = game.get_board()
+    while True:
+        board.display_board()
+        print("%s's turn" %game.get_turn())
+        from_pos = input('Move from: ')
+        to_pos = input('Move to: ')
+        game.make_move(from_pos, to_pos)
     """
 
 if __name__ == '__main__':
