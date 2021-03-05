@@ -185,14 +185,83 @@ class JanggiGame:
             print('The game is already finished.')
             return False
 
+        color = self.get_turn()
+        in_check = self.is_in_check(color)
+
         # passing turns
         if from_pos == to_pos:
+            if in_check:
+                print('Player is in check. Passing is not allowed.')
+                return False
 
+            self.next_turn()
+            return True
 
+        # determine whether the general is being moved
+        board = self.get_board()
+        current_player = self.get_current_player()
 
-        # passes are not allowed when the player is in check
+        if color == 'red':
+            general = current_player.get_pieces()['rge1']
+        else:
+            general = current_player.get_pieces()['bge1']
 
+        piece_id = board.get_occupation(from_pos)
+        if piece_id[1:3] == 'ge':
+            general_moving = True
+        else:
+            general_moving = False
 
+            # determine whether the general's move is allowed
+            if to_pos not in general.get_allowed_moves():
+                print("The general can't move to that position.")
+                return False
+
+        # determine if the move is allowed for other pieces
+        # this already will deny moves to positions occupied by a piece of the
+        # same color
+        if to_pos not in current_player.get_allowed_destinations():
+            print("The piece can't move to that position.")
+            return False
+
+        # if a piece is captured, remove it from the opponent's pieces
+        opponent = self.get_opponent()
+        captured_piece_id = board.get_occupation(to_pos)
+        if captured_piece_id is not None:
+            opponent.remove_piece(captured_piece_id)
+
+        # update the board and the moved piece's position attribute
+        board.move_piece(from_pos, to_pos)
+        if general_moving:
+            board.set_general_position(color, to_pos)
+        piece = current_player.get_pieces()[piece_id]
+        piece.set_position(to_pos)
+
+        # update the pieces and players based on the state of the board after
+        # the move
+        opponent.update_pieces()
+        current_player.update_pieces()
+        self.update_generals()
+
+        # the move must not put or leave the current player in check
+        if self.is_in_check(color):
+            print('The move is not allowed because it puts or leaves the player'
+                  'in check.')
+            self.undo_move(from_pos, to_pos)
+            return False
+
+        # determine whether the move won the game
+        opponent_color = opponent.get_color()
+        if self.is_in_check(opponent_color):
+            if self.is_checkmate():
+                print("Checkmate!")
+                if opponent_color == 'red':
+                    self.set_game_state('BLUE_WON')
+                else:
+                    self.set_game_state('RED_WON')
+
+        self.next_turn()
+        return True
 
     def undo_move(self, original_from_pos, original_to_pos, captured_piece=None):
         """
@@ -201,7 +270,7 @@ class JanggiGame:
         moved back and the captured_piece (Piece object) is initialized,
         placed on the board where it was before, and added back to its player.
         """
-        pass
+
 
     def update_generals(self):
         """Updates each general's allowed_moves based on the current state of
