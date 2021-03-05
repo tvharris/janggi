@@ -979,8 +979,8 @@ class General(Piece):
     of the palace.
 
     Data members: See __init__
-    Methods: inherited methods, overriding update_allowed_palace_destinations
-    and update_hyp_moves
+    Methods: inherited methods, overriding update_allowed_palace_destinations,
+        overriding update_allowed_destinations, and update_hyp_moves
     """
     def __init__(self, piece_id, position, board):
         """
@@ -990,6 +990,11 @@ class General(Piece):
             position: (str) board position, e.g., 'e2'
         """
         super().__init__(piece_id, position, board)
+
+    def update_allowed_destinations(self):
+        """Overrides the Piece's method. The General's allowed_destinations
+        are updated by JanggiGame.update_generals."""
+        pass
 
     def update_allowed_palace_destinations(self):
         """Overrides the Piece's method. The General can't move out of its
