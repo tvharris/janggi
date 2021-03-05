@@ -247,7 +247,7 @@ class JanggiGame:
         if self.is_in_check(color):
             print('The move is not allowed because it puts or leaves the player'
                   'in check.')
-            self.undo_move(from_pos, to_pos)
+            self.undo_move(from_pos, to_pos, captured_piece_id)
             return False
 
         # determine whether the move won the game
@@ -263,14 +263,45 @@ class JanggiGame:
         self.next_turn()
         return True
 
-    def undo_move(self, original_from_pos, original_to_pos, captured_piece=None):
+    def undo_move(self, original_from_pos, original_to_pos, captured_piece_id):
         """
         Reverts the latest move that was from the original_from_pos to the
-        original_to_pos (str positions). The piece in the original_to_pos is
-        moved back and the captured_piece (Piece object) is initialized,
-        placed on the board where it was before, and added back to its player.
+        original_to_pos (str positions). If the latest move did not result in
+        a capture, captured_piece_id must be None. Otherwise the piece in the
+        original_to_pos is moved back and the captured_piece_id (str) is used to
+        initialize the piece, place it on the board where it was before, and
+        add it back to its player.
         """
+        # update the piece's position attribute and its position on the board
+        board = self.get_board()
+        piece_id = board.get_occupation(original_to_pos)
+        current_player = self.get_current_player()
+        piece = current_player.get_pieces()[piece_id]
+        piece.set_position(original_from_pos)
 
+        # if the general was moved, set the board's general_position
+        color = current_player.get_color()
+        if original_to_pos == board.get_general_position(color):
+            board.set_general_position(color, original_from_pos)
+
+        # update the moved piece's position on the board
+        board.move_piece(original_to_pos, original_from_pos)
+
+        # add a captured piece back
+        opponent = self.get_opponent()
+        if captured_piece_id is not None:
+
+            # add it back to the board
+            board.set_occupation(captured_piece_id, original_to_pos)
+
+            # initialize the piece and add it back to the player
+            opponent.add_piece(captured_piece_id, original_to_pos)
+
+        # update the pieces and players based on the state of the board after
+        # the move is undone
+        opponent.update_pieces()
+        current_player.update_pieces()
+        self.update_generals()
 
     def update_generals(self):
         """Updates each general's allowed_moves based on the current state of
