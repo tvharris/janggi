@@ -41,6 +41,19 @@ class JanggiGame:
     def next_turn(self):
         """If the turn is 'blue', sets the turn to 'red' (str), and vice
         versa."""
+        pass
+
+    def get_board(self):
+        """Returns the board dictionary."""
+        return self._board
+
+    def get_red_player(self):
+        """Returns the Player object for the red player."""
+        return self._red_player
+
+    def get_blue_player(self):
+        """Returns the Player object for the blue player."""
+        return self._blue_player
 
     def get_game_state(self):
         """Returns game state (str) which may be 'UNFINISHED', 'RED_WON', or
@@ -94,7 +107,33 @@ class JanggiGame:
     def update_generals(self):
         """Updates each general's allowed_moves based on the current state of
         the board. Does not allow moves that put the general in check."""
-        pass
+        board = self.get_board()
+        red_player = self.get_red_player()
+        blue_player = self.get_blue_player()
+        players_general_ids = [(red_player, blue_player, 'rge1'),
+                               (blue_player, red_player, 'bge1')]
+
+        for player1, player2, general_id in players_general_ids:
+            general = player1.get_pieces()[general_id]
+            color = general_id[0]
+            hyp_moves = general.get_hyp_moves()
+            allowed_moves = hyp_moves.copy()
+            opponent_palace_destinations = player2.get_allowed_palace_destinations()
+
+            # eliminate moves that put the general in check
+            for destination in hyp_moves:
+                if destination in opponent_palace_destinations:
+                    del allowed_moves[destination]
+                    continue
+
+                # eliminate moves with the destination occupied by a piece of
+                # the same color
+                piece_id_at_destination = board.get_occupation(destination)
+                if piece_id_at_destination is not None:
+                    if piece_id_at_destination[0] == color:
+                        del allowed_moves[destination]
+
+            general.set_allowed_moves(allowed_moves)
 
 class Board:
     """
