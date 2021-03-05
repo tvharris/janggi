@@ -273,7 +273,7 @@ class Player:
     def __init__(self, color, board):
         """
         Creates a Janggi Player and calls _init_pieces to initialize the Piece
-        objects and add them to the player's pieces set
+        objects and add them to the player's pieces dictionary
 
         Private data members:
             allowed_destinations: set of destinations that the player's pieces
@@ -383,8 +383,8 @@ class Player:
             allowed_destinations |= set(piece.get_allowed_moves())
             allowed_palace_destinations |= piece.get_allowed_palace_destinations()
 
-            # determine if the piece has the opposing general in check and
-            # add it to the Player's pieces_checking if so
+            # if the piece has the opposing general in check add it to the
+            # Player's pieces_checking
             if piece.is_checking(opposing_general_position):
                 pieces_checking.add(piece)
 
@@ -940,7 +940,8 @@ class General(Piece):
     of the palace.
 
     Data members: See __init__
-    Methods: inherited methods and update_hyp_moves
+    Methods: inherited methods, overriding update_allowed_palace_destinations
+    and update_hyp_moves
     """
     def __init__(self, piece_id, position, board):
         """
@@ -950,6 +951,11 @@ class General(Piece):
             position: (str) board position, e.g., 'e2'
         """
         super().__init__(piece_id, position, board)
+
+    def update_allowed_palace_destinations(self):
+        """Overrides the Piece's method. The General can't move out of its
+        own palace."""
+        pass
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
@@ -1007,7 +1013,8 @@ class Guard(Piece):
     of the palace.
 
     Data members: See __init__
-    Methods: inherited methods and update_hyp_moves
+    Methods: inherited methods, overriding update_allowed_palace_destinations
+        and update_hyp_moves
     """
     def __init__(self, piece_id, position, board):
         """
@@ -1018,6 +1025,11 @@ class Guard(Piece):
             position: (str) board position, e.g., 'e2'
         """
         super().__init__(piece_id, position, board)
+
+    def update_allowed_palace_destinations(self):
+        """Overrides the Piece's method. A Guard can't move out of its
+        own palace."""
+        pass
 
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
