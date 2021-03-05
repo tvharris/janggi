@@ -89,7 +89,7 @@ class JanggiGame:
         else:
             opponent = self.get_red_player()
 
-        if opponent.get_pieces_checking() != []:
+        if len(opponent.get_pieces_checking()) > 0:
             return True
         return False
 
@@ -111,37 +111,61 @@ class JanggiGame:
         no allowed moves, or there are no moves that can block or capture the
         piece(s) that has the general in check.
         """
+        board = self.get_board()
         current_player = self.get_current_player()
         pieces_checking = current_player.get_pieces_checking()
 
         opponent = self.get_opponent()
         opponent_color = opponent.get_color()
+        opponent_pieces = opponent.get_pieces()
         opponent_allowed_destinations = opponent.get_allowed_destinations()
 
         if opponent_color == 'red':
-            general = opponent.get_pieces()['rge1']
+            general = opponent_pieces['rge1']
         else:
-            general = opponent.get_color()['bge1']
+            general = opponent_pieces['bge1']
 
         # if general has an allowed move it can get out of check
-        if general.get_allowed_moves() != []:
+        if len(general.get_allowed_moves()) > 0:
             return False
 
         # check whether only one piece has the general in check
         if len(pieces_checking) == 1:
 
-            # if it can be captured, it's not a checkmate
+            # if the piece can be captured, it's not a checkmate
             if pieces_checking[0].get_position() in opponent_allowed_destinations:
                 return False
 
             # if the piece is a cannon, check whether it is jumping an
             # opponent's piece. If that piece can be moved, the cannon no
             # longer has the general in check
+            if pieces_checking[0].get_piece_id()[1:3] == 'ca':
+                path_to_general = pieces_checking[0].get_path_to_general()
+                for position in path_to_general:
+                    piece_id_in_path = board.get_occupation(position)
+                    if piece_id_in_path is not None:
+                        piece_in_path = opponent_pieces[piece_id_in_path]
+                        if len(piece_in_path.get_allowed_moves()) > 0:
+                            return False
 
+        # check whether all pieces with the general in check can be blocked
+        # in a single move. Don't include soldiers, because they can't be
+        # blocked.
+        # first, get list of path_to_general sets
+        path_to_general_sets = [piece.get_path_to_general for piece in
+                           pieces_checking if piece.get_piece_id()[1:3] != 'so']
 
+        # get positions the opponent must reach to block all paths
+        # if there is only one piece with the general in check, the
+        # positions_to_block will just be that piece's path_to_general
+        positions_to_block = set.intersection(*path_to_general_sets)
+        if len(positions_to_block) > 0:
+            blocking_destinations = positions_to_block & \
+                                    opponent_allowed_destinations
+            if len(blocking_destinations) > 0:
+                return False
 
-
-
+        return True
 
     def make_move(self, from_pos, to_pos):
         """
@@ -488,7 +512,7 @@ class Player:
             # if the piece has the opposing general in check add it to the
             # Player's pieces_checking
             if piece.is_checking(opposing_general_position):
-                pieces_checking.append(piece))
+                pieces_checking.append(piece)
 
         self.set_allowed_destinations(allowed_destinations)
         self.set_allowed_palace_destinations(allowed_palace_destinations)
