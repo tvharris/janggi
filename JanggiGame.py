@@ -1,5 +1,5 @@
 # Author: Travis Harris
-# Date: 2/26/2021
+# Date: 3/5/2021
 # Description: Implement the board game Janggi, with a class (JanggiGame) for
 # playing the game.
 
@@ -180,7 +180,19 @@ class JanggiGame:
             (e.g., 'b3')
         Returns: True if the move is allowed, otherwise False.
         """
-        pass
+        # confirm game is unfinished
+        if self.get_game_state() != 'UNFINISHED':
+            print('The game is already finished.')
+            return False
+
+        # passing turns
+        if from_pos == to_pos:
+
+
+
+        # passes are not allowed when the player is in check
+
+
 
     def undo_move(self, original_from_pos, original_to_pos, captured_piece=None):
         """
@@ -897,12 +909,13 @@ class Cannon(Piece):
         hyp_moves = self.get_hyp_moves()
         allowed_moves = hyp_moves.copy()
 
-        # eliminate moves with the destination occupied by a piece of the same
-        # color
+        # eliminate moves with the destination occupied by a cannon or a piece
+        # of the same color
         for destination in hyp_moves:
             piece_id_at_destination = board.get_occupation(destination)
             if piece_id_at_destination is not None:
-                if piece_id_at_destination[0] == color:
+                if piece_id_at_destination[0] == color or \
+                        piece_id_at_destination[1:3] == 'ca':
                     del allowed_moves[destination]
 
         # prevent iterating through already eliminated moves
