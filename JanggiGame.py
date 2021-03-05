@@ -41,7 +41,11 @@ class JanggiGame:
     def next_turn(self):
         """If the turn is 'blue', sets the turn to 'red' (str), and vice
         versa."""
-        pass
+        turn = self.get_turn()
+        if turn == 'blue':
+            self._turn = 'red'
+        else:
+            self._turn = 'blue'
 
     def get_board(self):
         """Returns the board dictionary."""
@@ -980,7 +984,7 @@ class General(Piece):
 
     Data members: See __init__
     Methods: inherited methods, overriding update_allowed_palace_destinations,
-        overriding update_allowed_moves, and update_hyp_moves
+        and update_hyp_moves
     """
     def __init__(self, piece_id, position, board):
         """
@@ -991,10 +995,11 @@ class General(Piece):
         """
         super().__init__(piece_id, position, board)
 
-    def update_allowed_moves(self):
-        """Overrides the Piece's method. The General's allowed_destinations
-        are updated by JanggiGame.update_generals."""
-        pass
+     # TODO with this the general's allowed_moves are not set for the first turn
+#    def update_allowed_moves(self):
+#        """Overrides the Piece's method. The General's allowed_destinations
+#        are updated by JanggiGame.update_generals."""
+#        pass
 
     def update_allowed_palace_destinations(self):
         """Overrides the Piece's method. The General can't move out of its
