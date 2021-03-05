@@ -197,17 +197,21 @@ class JanggiGame:
             self.next_turn()
             return True
 
-        # determine whether the general is being moved
+        # confirm that the piece belongs to the player
         board = self.get_board()
+        piece_id = board.get_occupation(from_pos)
         current_player = self.get_current_player()
+        if piece_id not in current_player.get_pieces():
+            print("The piece belongs to the other player.")
+            return False
+
+        # determine whether the general is being moved
         general_moving = False
 
         if color == 'red':
             general = current_player.get_pieces()['rge1']
         else:
             general = current_player.get_pieces()['bge1']
-
-        piece_id = board.get_occupation(from_pos)
 
         if piece_id[1:3] == 'ge':
             general_moving = True
@@ -220,10 +224,6 @@ class JanggiGame:
         # determine if the move is allowed for other pieces
         # this already will deny moves to positions occupied by a piece of the
         # same color
-        if piece_id not in current_player.get_pieces():
-            print("The piece belongs to the other player.")
-            return False
-
         if to_pos not in current_player.get_allowed_destinations():
             print("The piece can't move to that position.")
             return False
@@ -1442,9 +1442,6 @@ class Soldier(Piece):
 def main():
     """Lets users play the game."""
     game = JanggiGame()
-    game.make_move('d1', 'd1')
-    game.make_move('d1', 'e1')
-    """
     board = game.get_board()
     while True:
         board.display_board()
@@ -1452,7 +1449,6 @@ def main():
         from_pos = input('Move from: ')
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
-    """
 
 if __name__ == '__main__':
     main()
