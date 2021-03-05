@@ -65,6 +65,12 @@ class JanggiGame:
             return self.get_red_player()
         return self.get_blue_player()
 
+    def get_opponent(self):
+        """Returns the Player object for the player whose turn it is not."""
+        if self.get_turn() = 'red':
+            return self.get_blue_player()
+        return self.get_red_player()
+
     def get_game_state(self):
         """Returns game state (str) which may be 'UNFINISHED', 'RED_WON', or
         BLUE_WON'."""
@@ -74,11 +80,30 @@ class JanggiGame:
         """Sets the game state to the specified game_state (str)."""
         self._game_state = game_state
 
-    def is_in_check(self, player):
-        """Returns True if the player ('red' or 'blue') is in check, otherwise
-        False. In check means the general could be captured by the opponent on
-        their next move."""
-        pass
+    def is_in_check(self, color):
+        """Takes a color (str) 'blue' or 'red' and returns True if the
+        corresponding player is in check, otherwise False. In check means the
+        general could be captured by the opponent on their next move."""
+        if color == 'red':
+            opponent = self.get_blue_player()
+        else:
+            opponent = self.get_red_player()
+
+        if opponent.get_pieces_checking() is not None:
+            return True
+        return False
+
+        #TODO: consider below alternative method
+        #board = self.get_board()
+        #general_position = board.get_general_position(current_player_color)
+        #opponent = self.get_opponent()
+
+        #if general_position in opponent.get_allowed_destinations():
+        #    return True
+        #return False
+
+
+
 
     def is_checkmate(self):
         """
