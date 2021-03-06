@@ -180,6 +180,16 @@ class JanggiGame:
             (e.g., 'b3')
         Returns: True if the move is allowed, otherwise False.
         """
+        # input validation
+        for pos in [from_pos, to_pos]:
+            if pos == '':
+                print('No position specified')
+                return False
+            if pos[0] < 'a' or pos[0] > 'i' or \
+                    int(pos[1:]) < 1 or int(pos[1:]) > 10:
+                print('Invalid board position')
+                return False
+
         # confirm game is unfinished
         if self.get_game_state() != 'UNFINISHED':
             print('The game is already finished.')
@@ -250,7 +260,7 @@ class JanggiGame:
         # the move must not put or leave the current player in check
         if self.is_in_check(color):
             print('The move is not allowed because it puts or leaves the player'
-                  'in check.')
+                  ' in check.')
             self.undo_move(from_pos, to_pos, captured_piece_id)
             return False
 
@@ -1446,7 +1456,6 @@ class Soldier(Piece):
 def main():
     """Lets users play the game."""
     game = JanggiGame()
-    """
     board = game.get_board()
     while True:
         board.display_board()
@@ -1455,7 +1464,6 @@ def main():
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
     """
-
     game.make_move('e7', 'e6')
     game.make_move('e2', 'e2')
     game.make_move('e6', 'e5')
@@ -1466,7 +1474,7 @@ def main():
     game.make_move('e4', 'e3')
     # red moves guard while red general should be in check by bso3
     game.make_move('f1', 'f2')
-
+    """
 
 if __name__ == '__main__':
     main()
