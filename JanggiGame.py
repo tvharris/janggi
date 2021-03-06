@@ -257,6 +257,7 @@ class JanggiGame:
         # determine whether the move won the game
         opponent_color = opponent.get_color()
         if self.is_in_check(opponent_color):
+            print("The move put the other player in check.")
             if self.is_checkmate():
                 print("Checkmate!")
                 if opponent_color == 'red':
@@ -615,7 +616,10 @@ class Player:
 
         color = self.get_color()
         board = self.get_board()
-        opposing_general_position = board.get_general_position(color)
+        if color == 'red':
+            opposing_general_position = board.get_general_position('blue')
+        else:
+            opposing_general_position = board.get_general_position('red')
 
         for piece in pieces:
             piece.update_hyp_moves()
@@ -1442,6 +1446,7 @@ class Soldier(Piece):
 def main():
     """Lets users play the game."""
     game = JanggiGame()
+    """
     board = game.get_board()
     while True:
         board.display_board()
@@ -1449,6 +1454,19 @@ def main():
         from_pos = input('Move from: ')
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
+    """
+
+    game.make_move('e7', 'e6')
+    game.make_move('e2', 'e2')
+    game.make_move('e6', 'e5')
+    game.make_move('e2', 'e2')
+    game.make_move('e5', 'e4')
+    game.make_move('e2', 'e2')
+    # bso3 moves into checking position
+    game.make_move('e4', 'e3')
+    # red moves guard while red general should be in check by bso3
+    game.make_move('f1', 'f2')
+
 
 if __name__ == '__main__':
     main()
