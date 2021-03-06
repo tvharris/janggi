@@ -15,20 +15,24 @@ class JanggiGame:
     Player to the General, which would not be available to the General.
 
     Data members: See __init__
-    Methods: get_game_state, set_game_state, get_turn, next_turn, is_in_check,
-    is_checkmate, make_move, undo_move, update_generals, get_current_player
+    Methods: get_game_state, set_game_state, get_turn, get_num_turns, next_turn,
+        is_in_check, is_checkmate, make_move, undo_move, update_generals,
+        get_current_player
     """
     def __init__(self):
         """
         Creates a JanggiGame.
         Private data members:
             game_state: (str) 'UNFINISHED', 'RED_WON', or 'BLUE_WON'
+            turn: represents whose turn it is, (str) 'red' or 'blue'
+            num_turns: the number of turns that have been played (int)
             board: Board object
             red_player: Player object
             blue_player: Player object
         """
         self._game_state = 'UNFINISHED'
         self._turn = 'blue'
+        self._num_turns = 0
         self._board = Board()
         self._red_player = Player('red', self._board)
         self._blue_player = Player('blue', self._board)
@@ -38,6 +42,10 @@ class JanggiGame:
         which player's turn it is."""
         return self._turn
 
+    def get_num_turns(self):
+        """Returns the number of turns that have been played (int)"""
+        return self._num_turns
+
     def next_turn(self):
         """If the turn is 'blue', sets the turn to 'red' (str), and vice
         versa."""
@@ -46,6 +54,9 @@ class JanggiGame:
             self._turn = 'red'
         else:
             self._turn = 'blue'
+
+        # increment the number of turns that have been played
+        self._num_turns += 1
 
     def get_board(self):
         """Returns the board dictionary."""
@@ -153,7 +164,7 @@ class JanggiGame:
         # in a single move. Don't include soldiers, because they can't be
         # blocked.
         # first, get list of path_to_general sets
-        path_to_general_sets = [piece.get_path_to_general for piece in
+        path_to_general_sets = [piece.get_path_to_general() for piece in
                            pieces_checking if piece.get_piece_id()[1:3] != 'so']
 
         # get positions the opponent must reach to block all paths
@@ -199,10 +210,13 @@ class JanggiGame:
             print('The game is already finished.')
             return False
 
-        color = self.get_turn()
-        in_check = self.is_in_check(color)
+        # if this is the first turn, initialize the generals' allowed moves
+        if self.get_num_turns() == 0:
+            self.update_generals()
 
         # passing turns
+        color = self.get_turn()
+        in_check = self.is_in_check(color)
         if from_pos == to_pos:
             if in_check:
                 print('Player is in check. Passing is not allowed.')
@@ -1218,11 +1232,10 @@ class General(Piece):
         """
         super().__init__(piece_id, position, board)
 
-     # TODO with this the general's allowed_moves are not set for the first turn
-#    def update_allowed_moves(self):
-#        """Overrides the Piece's method. The General's allowed_destinations
-#        are updated by JanggiGame.update_generals."""
-#        pass
+    def update_allowed_moves(self):
+        """Overrides the Piece's method. The General's allowed_destinations
+        are updated by JanggiGame.update_generals."""
+        pass
 
     def update_allowed_palace_destinations(self):
         """Overrides the Piece's method. The General can't move out of its
@@ -1461,6 +1474,7 @@ def main():
     """Lets users play the game."""
     game = JanggiGame()
     board = game.get_board()
+    """
     while True:
         board.display_board()
         print("%s's turn" %game.get_turn())
@@ -1468,17 +1482,61 @@ def main():
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
     """
+    # bs03 to e4
     game.make_move('e7', 'e6')
     game.make_move('e2', 'e2')
     game.make_move('e6', 'e5')
     game.make_move('e2', 'e2')
     game.make_move('e5', 'e4')
     game.make_move('e2', 'e2')
-    # bso3 moves into checking position
-    game.make_move('e4', 'e3')
-    # red moves guard while red general should be in check by bso3
-    game.make_move('f1', 'f2')
-    """
+
+    # bch1 to d8
+    game.make_move('a10', 'a9')
+    game.make_move('e1', 'e1')
+    game.make_move('a9', 'd9')
+    game.make_move('e1', 'e1')
+    game.make_move('d9', 'd8')
+    game.make_move('e1', 'e1')
+
+    # bso2 to e7
+    game.make_move('c7', 'd7')
+    game.make_move('e1', 'e1')
+    game.make_move('d7', 'e7')
+
+    # rch2 to g2
+    game.make_move('i1', 'i2')
+    game.make_move('b2', 'b2')
+    game.make_move('i2', 'g2')
+    # bca1 to e8
+    game.make_move('b8', 'e8')
+
+    # rso5 to h4
+    game.make_move('i4', 'h4')
+    game.make_move('g2', 'g2')
+
+    # rca2 to h5
+    game.make_move('h3', 'h5')
+
+    # bch2 to g8
+    game.make_move('i10', 'i9')
+    game.make_move('e2', 'e2')
+    game.make_move('i9', 'g9')
+    game.make_move('e2', 'e2')
+    game.make_move('g9', 'g8')
+    game.make_move('e2', 'e2')
+
+    # bca2 to f8
+    game.make_move('h8', 'f8')
+
+    # rgu2 to e1
+    game.make_move('f1', 'e1')
+
+    # bso3 to f3
+    # checkmate: bca1 is checking by jumping bso2, rge1 can't move
+    game.make_move('e4', 'f4')
+
+    board.display_board()
+
 
 if __name__ == '__main__':
     main()
