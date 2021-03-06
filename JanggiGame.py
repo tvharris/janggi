@@ -144,9 +144,10 @@ class JanggiGame:
                 for position in path_to_general:
                     piece_id_in_path = board.get_occupation(position)
                     if piece_id_in_path is not None:
-                        piece_in_path = opponent_pieces[piece_id_in_path]
-                        if len(piece_in_path.get_allowed_moves()) > 0:
-                            return False
+                        if piece_id_in_path[0] == opponent_color[0]:
+                            piece_in_path = opponent_pieces[piece_id_in_path]
+                            if len(piece_in_path.get_allowed_moves()) > 0:
+                                return False
 
         # check whether all pieces with the general in check can be blocked
         # in a single move. Don't include soldiers, because they can't be
@@ -184,6 +185,9 @@ class JanggiGame:
         for pos in [from_pos, to_pos]:
             if pos == '':
                 print('No position specified')
+                return False
+            if len(pos) < 2 or len(pos) > 3:
+                print('Invalid board position')
                 return False
             if pos[0] < 'a' or pos[0] > 'i' or \
                     int(pos[1:]) < 1 or int(pos[1:]) > 10:
