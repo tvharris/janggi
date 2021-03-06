@@ -218,7 +218,7 @@ class JanggiGame:
         if self.get_num_turns() == 0:
             self.update_generals()
 
-        # passing turns
+        # allow passing turns
         color = self.get_turn()
         in_check = self.is_in_check(color)
         if from_pos == to_pos:
@@ -253,10 +253,11 @@ class JanggiGame:
                 print("The general can't move to that position.")
                 return False
 
-        # determine if the move is allowed for other pieces
+        # determine whether the move is allowed
         # this already will deny moves to positions occupied by a piece of the
         # same color
-        if to_pos not in current_player.get_allowed_destinations():
+        piece = current_player.get_pieces()[piece_id]
+        if to_pos not in piece.get_allowed_moves():
             print("The piece can't move to that position.")
             return False
 
@@ -270,7 +271,6 @@ class JanggiGame:
         board.move_piece(from_pos, to_pos)
         if general_moving:
             board.set_general_position(color, to_pos)
-        piece = current_player.get_pieces()[piece_id]
         piece.set_position(to_pos)
 
         # update the pieces and players based on the state of the board after
@@ -1476,16 +1476,16 @@ class Soldier(Piece):
 
 def main():
     """Lets users play the game."""
+    """
     game = JanggiGame()
     board = game.get_board()
-    """
     while True:
         board.display_board()
         print("%s's turn" %game.get_turn())
         from_pos = input('Move from: ')
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
-    """
+        
     # bs03 to e4
     game.make_move('e7', 'e6')
     game.make_move('e2', 'e2')
@@ -1540,6 +1540,7 @@ def main():
     game.make_move('e4', 'f4')
 
     board.display_board()
+    """
 
 
 if __name__ == '__main__':
