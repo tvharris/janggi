@@ -221,9 +221,14 @@ class JanggiGame:
             self.next_turn()
             return True
 
-        # confirm that the piece belongs to the player
+        # confirm that there is a piece to move
         board = self.get_board()
         piece_id = board.get_occupation(from_pos)
+        if piece_id is None:
+            print("The position to move from is empty.")
+            return False
+
+        # confirm that the piece belongs to the player
         current_player = self.get_current_player()
         if piece_id not in current_player.get_pieces():
             print("The piece belongs to the other player.")
@@ -1472,7 +1477,6 @@ class Soldier(Piece):
 
 def main():
     """Lets users play the game."""
-    """
     game = JanggiGame()
     board = game.get_board()
     while True:
@@ -1481,7 +1485,7 @@ def main():
         from_pos = input('Move from: ')
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
-
+    """
     game = JanggiGame()
     board = game.get_board()
 
