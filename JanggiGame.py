@@ -1,8 +1,9 @@
 # Author: Travis Harris
-# Date: 3/5/2021
+# Date: 3/6/2021
 # Description: Implement the board game Janggi, with a class (JanggiGame) for
-# playing the game. The game is played by passing the position of the piece to
-# move and its destination to the make_move method.
+# playing the game. The game is played using the make_move method, which takes
+# the position of the piece to be moved and its destination. The game ends by
+# checkmate.
 
 class JanggiGame:
     """
@@ -104,15 +105,6 @@ class JanggiGame:
         if len(opponent.get_pieces_checking()) > 0:
             return True
         return False
-
-        #TODO: consider below alternative method
-        #board = self.get_board()
-        #general_position = board.get_general_position(current_player_color)
-        #opponent = self.get_opponent()
-
-        #if general_position in opponent.get_allowed_destinations():
-        #    return True
-        #return False
 
     def is_checkmate(self):
         """
@@ -370,6 +362,10 @@ class JanggiGame:
                         del allowed_moves[destination]
 
             general.set_allowed_moves(allowed_moves)
+
+            # update each player's allowed_destinations
+            allowed_destinations = player1.get_allowed_destinations()
+            allowed_destinations |= set(allowed_moves)
 
 
 class Board:
@@ -1239,7 +1235,7 @@ class General(Piece):
     def update_allowed_moves(self):
         """Overrides the Piece's method. The General's allowed_destinations
         are updated by JanggiGame.update_generals."""
-        pass
+        self.set_allowed_moves({})
 
     def update_allowed_palace_destinations(self):
         """Overrides the Piece's method. The General can't move out of its
@@ -1485,7 +1481,10 @@ def main():
         from_pos = input('Move from: ')
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
-        
+
+    game = JanggiGame()
+    board = game.get_board()
+
     # bs03 to e4
     game.make_move('e7', 'e6')
     game.make_move('e2', 'e2')
@@ -1540,8 +1539,82 @@ def main():
     game.make_move('e4', 'f4')
 
     board.display_board()
-    """
 
+    game = JanggiGame()
+    board = game.get_board()
+
+    # bs03 to d2
+    game.make_move('e7', 'e6')
+    game.make_move('e2', 'e2')
+    game.make_move('e6', 'e5')
+    game.make_move('e2', 'e2')
+    game.make_move('e5', 'e4')
+    game.make_move('e2', 'e2')
+    game.make_move('e4', 'd4')
+    game.make_move('e2', 'e2')
+    game.make_move('d4', 'c4')
+    game.make_move('e2', 'e2')
+
+    # bch1 to d8
+    game.make_move('a10', 'a9')
+    game.make_move('e1', 'e1')
+    game.make_move('a9', 'd9')
+    game.make_move('e1', 'e1')
+    game.make_move('d9', 'd8')
+    game.make_move('e1', 'e1')
+
+    # rso2 to e4
+#    game.make_move('c7', 'c7')
+#    game.make_move('c4', 'd4')
+#    game.make_move('c7', 'c7')
+#    game.make_move('d4', 'e4')
+    game.make_move('c7', 'c7')
+
+    # rch2 to g2
+    game.make_move('i1', 'i2')
+    game.make_move('b2', 'b2')
+    game.make_move('i2', 'g2')
+    game.make_move('b2', 'b2')
+
+
+    # rso5 to h4
+    game.make_move('i4', 'h4')
+    game.make_move('g2', 'g2')
+
+    # rca2 to h5
+    game.make_move('h3', 'h5')
+
+    # bch2 to g8
+    game.make_move('i10', 'i9')
+    game.make_move('e2', 'e2')
+    game.make_move('i9', 'g9')
+    game.make_move('e2', 'e2')
+    game.make_move('g9', 'g8')
+    game.make_move('e2', 'e2')
+
+    # bca2 to f8
+    game.make_move('h8', 'f8')
+
+    # rgu2 to e1
+    game.make_move('f1', 'e1')
+    game.make_move('b8', 'b8')
+    game.make_move('g4', 'g4')
+
+    # bso4 to f7
+    game.make_move('g7', 'f7')
+    game.make_move('g4', 'g4')
+
+    # bso2 to e7
+    game.make_move('c7', 'd7')
+    game.make_move('g4', 'g4')
+    game.make_move('d7', 'e7')
+    game.make_move('g4', 'g4')
+
+    # bca1 to e8
+    game.make_move('b8', 'e8')
+
+    board.display_board()
+"""
 
 if __name__ == '__main__':
     main()
