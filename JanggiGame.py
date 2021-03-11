@@ -163,12 +163,13 @@ class JanggiGame:
         # get positions the opponent must reach to block all paths
         # if there is only one piece with the general in check, the
         # positions_to_block will just be that piece's path_to_general
-        positions_to_block = set.intersection(*path_to_general_sets)
-        if len(positions_to_block) > 0:
-            blocking_destinations = positions_to_block & \
-                                    opponent_allowed_destinations
-            if len(blocking_destinations) > 0:
-                return False
+        if path_to_general_sets != []:
+            positions_to_block = set.intersection(*path_to_general_sets)
+            if len(positions_to_block) > 0:
+                blocking_destinations = positions_to_block & \
+                                        opponent_allowed_destinations
+                if len(blocking_destinations) > 0:
+                    return False
 
         return True
 
@@ -626,7 +627,7 @@ class Player:
 
     def get_allowed_palace_destinations(self):
         """Returns the allowed_palace_destinations set"""
-        return self._allowed_destinations
+        return self._allowed_palace_destinations
 
     def set_allowed_palace_destinations(self, allowed_palace_destinations):
         """Sets the Player's allowed_destinations set to the set parameter"""
@@ -992,8 +993,8 @@ class Cannon(Piece):
     they must jump exactly one other piece, which may not be another cannon.
 
     Data members: See __init__
-    Methods: inherited methods, update_hyp_moves, and overriding version of
-        update_allowed_moves
+    Methods: inherited methods, update_hyp_moves, and overriding versions of
+        update_allowed_moves and update_allowed_palace_destinations
     """
     def __init__(self, piece_id, position, board):
         """
@@ -1096,6 +1097,53 @@ class Cannon(Piece):
 
         self.set_allowed_moves(allowed_moves)
 
+    def update_allowed_palace_destinations(self):
+        """Updates the piece's set of allowed_palace_destinations. These are
+        positions in the opposing palace that the piece can move to, including
+        those that are occupied by a piece of the same color."""
+        piece_id = self.get_piece_id()
+        color = piece_id[0]
+        board = self.get_board()
+        hyp_moves = self.get_hyp_moves()
+        allowed_moves = hyp_moves.copy()
+
+        red_palace = {'d1', 'e1', 'f1', 'd2', 'e2', 'f2', 'd3', 'e3', 'f3'}
+        blue_palace = {'d8', 'e8', 'f8', 'd9', 'e9', 'f9', 'd10', 'e10', 'f10'}
+
+        # eliminate moves without an occupied intermediate position
+        for destination, intermediates in hyp_moves.items():
+            for intermediate in intermediates:
+                # if there is an intermediate, proceed to the next destination
+                if board.get_occupation(intermediate) is not None:
+                    break
+                # if current intermediate position is the last one in the list,
+                # then the path has no intermediates occupied
+                elif intermediate == intermediates[-1]:
+                    del allowed_moves[destination]
+
+        # prevent iterating through already eliminated moves
+        hyp_moves = allowed_moves.copy()
+
+        # eliminate moves with >1 occupied intermediate position
+        # and those with only 1 if it is a cannon
+        for destination, intermediates in hyp_moves.items():
+            num_intermediate_pieces = 0  # initialize counter
+            for intermediate in intermediates:
+                piece_id_at_intermediate = board.get_occupation(intermediate)
+                if piece_id_at_intermediate is not None:
+                    num_intermediate_pieces += 1
+                    if piece_id_at_intermediate[1:3] == 'ca' or \
+                            num_intermediate_pieces > 1:
+                        if destination in allowed_moves:  # not yet deleted
+                            del allowed_moves[destination]
+
+        # find intersection of allowed_moves and the opposing player's palace
+        if color == 'r':
+            allowed_palace_destinations = set(allowed_moves) & blue_palace
+        else:
+            allowed_palace_destinations = set(allowed_moves) & red_palace
+
+        self.set_allowed_palace_destinations(allowed_palace_destinations)
 
 class Chariot(Piece):
     """
@@ -1477,6 +1525,7 @@ class Soldier(Piece):
 
 def main():
     """Lets users play the game."""
+    """
     game = JanggiGame()
     board = game.get_board()
     while True:
@@ -1485,6 +1534,7 @@ def main():
         from_pos = input('Move from: ')
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
+    """
     """
     game = JanggiGame()
     board = game.get_board()
@@ -1541,9 +1591,9 @@ def main():
     # bso3 to f3
     # checkmate: bca1 is checking by jumping bso2, rge1 can't move
     game.make_move('e4', 'f4')
-
     board.display_board()
 
+    # CANNON WITH BS02 JUMP
     game = JanggiGame()
     board = game.get_board()
 
@@ -1561,29 +1611,20 @@ def main():
 
     # bch1 to d8
     game.make_move('a10', 'a9')
-    game.make_move('e1', 'e1')
+    game.make_move('e2', 'e2')
     game.make_move('a9', 'd9')
-    game.make_move('e1', 'e1')
+    game.make_move('e2', 'e2')
     game.make_move('d9', 'd8')
-    game.make_move('e1', 'e1')
-
-    # rso2 to e4
-#    game.make_move('c7', 'c7')
-#    game.make_move('c4', 'd4')
-#    game.make_move('c7', 'c7')
-#    game.make_move('d4', 'e4')
-    game.make_move('c7', 'c7')
 
     # rch2 to g2
     game.make_move('i1', 'i2')
-    game.make_move('b2', 'b2')
+    game.make_move('e9', 'e9')
     game.make_move('i2', 'g2')
-    game.make_move('b2', 'b2')
-
+    game.make_move('e9', 'e9')
 
     # rso5 to h4
     game.make_move('i4', 'h4')
-    game.make_move('g2', 'g2')
+    game.make_move('e9', 'e9')
 
     # rca2 to h5
     game.make_move('h3', 'h5')
@@ -1601,24 +1642,115 @@ def main():
 
     # rgu2 to e1
     game.make_move('f1', 'e1')
-    game.make_move('b8', 'b8')
-    game.make_move('g4', 'g4')
 
     # bso4 to f7
     game.make_move('g7', 'f7')
-    game.make_move('g4', 'g4')
+
+    # rso4 to e4
+    game.make_move('g4', 'f4')
+    game.make_move('e9', 'e9')
+    game.make_move('f4', 'e4')
+
+    # bca1 to e8
+    # check
+    game.make_move('b8', 'e8')
+
+    # rso4 back to g4
+    game.make_move('e4', 'f4')
+    game.make_move('e9', 'e9')
+    game.make_move('f4', 'g4')
 
     # bso2 to e7
     game.make_move('c7', 'd7')
-    game.make_move('g4', 'g4')
+    game.make_move('e2', 'e2')
+    # checkmate
     game.make_move('d7', 'e7')
-    game.make_move('g4', 'g4')
-
-    # bca1 to e8
-    game.make_move('b8', 'e8')
 
     board.display_board()
-"""
+
+    """
+    # Soldier causes checkmate; can't be captured by general because
+    # it's covered by an elephant
+    game = JanggiGame()
+    board = game.get_board()
+
+    # bs03 to d2
+    game.make_move('e7', 'e6')
+    game.make_move('e2', 'e2')
+    game.make_move('e6', 'e5')
+    game.make_move('e2', 'e2')
+    game.make_move('e5', 'e4')
+    game.make_move('e2', 'e2')
+    game.make_move('e4', 'd4')
+    game.make_move('e2', 'e2')
+    game.make_move('d4', 'c4')
+    game.make_move('e2', 'e2')
+
+    # bch1 to d7
+    game.make_move('a10', 'a9')
+    game.make_move('e2', 'e2')
+    game.make_move('a9', 'd9')
+    game.make_move('e2', 'e2')
+    game.make_move('d9', 'd8')
+    game.make_move('e2', 'e2')
+    game.make_move('d8', 'd7')
+    game.make_move('e2', 'e2')
+    game.make_move('d7', 'd6')
+
+    # rch2 to g2
+    game.make_move('i1', 'i2')
+    game.make_move('e9', 'e9')
+    game.make_move('i2', 'g2')
+    game.make_move('e9', 'e9')
+
+    # rso5 to h4
+    game.make_move('i4', 'h4')
+    game.make_move('e9', 'e9')
+
+    # rca2 to h5
+    game.make_move('h3', 'h5')
+
+    # bch2 to g8
+    game.make_move('i10', 'i9')
+    game.make_move('e2', 'e2')
+    game.make_move('i9', 'g9')
+    game.make_move('e2', 'e2')
+    game.make_move('g9', 'g8')
+    game.make_move('e2', 'e2')
+
+    # bca2 to f8
+    game.make_move('h8', 'f8')
+
+    # rgu2 to e1
+    game.make_move('f1', 'e1')
+
+    # bso4 to f7
+    game.make_move('g7', 'f7')
+
+    # bso5 to i6
+    game.make_move('e2', 'e2')
+    game.make_move('i7', 'i6')
+
+    # bel2 to b5
+    game.make_move('e2', 'e2')
+    game.make_move('g10', 'i7')
+    game.make_move('e2', 'e2')
+    game.make_move('i7', 'f5')
+    game.make_move('e2', 'e2')
+    game.make_move('f5', 'd8')
+    game.make_move('e2', 'e2')
+    game.make_move('d8', 'b5')
+
+    # bso3 to e3
+    game.make_move('e2', 'e2')
+    game.make_move('c4', 'd4')
+    game.make_move('e2', 'e2')
+    game.make_move('d4', 'e4')
+    game.make_move('e2', 'e2')
+    # checkmate
+    game.make_move('e4', 'e3')
+
+    board.display_board()
 
 if __name__ == '__main__':
     main()
