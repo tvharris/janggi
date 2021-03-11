@@ -1,9 +1,10 @@
 # Author: Travis Harris
-# Date: 3/6/2021
-# Description: Implement the board game Janggi, with a class (JanggiGame) for
-# playing the game. The game is played using the make_move method, which takes
-# the position of the piece to be moved and its destination. The game ends by
-# checkmate.
+# Date: 3/11/2021
+# Description: Implementation of the board game Janggi, with a class (JanggiGame)
+# for playing the game. The game is played using the make_move method, which
+# takes the position of the piece to be moved and its destination. The game ends
+# by checkmate. Movement rules are described in the docstrings for each
+# individual piece's class, and on Wikipedia.
 
 class JanggiGame:
     """
@@ -393,7 +394,8 @@ class Board:
             board: dictionary organized as {position (str): piece_id (str)} for
                 all positions on a Janggi board. The board is initialized with
                 the pieces in their starting positions for a Janggi game.
-            general_position: dictionary organized as {color (str): position (str)}
+            general_position: dictionary organized as
+            {color (str): position (str)}
         """
         self._general_position = {'red': 'e2', 'blue': 'e9'}
         self._board = {'a1': 'rch1', 'b1': 'rel1', 'c1': 'rho1', 'd1': 'rgu1', 'e1': '----',
@@ -1372,8 +1374,6 @@ class Guard(Piece):
     def update_hyp_moves(self):
         """Updates and returns the piece's hypothetical moves dictionary. These
         moves do not consider the locations of other pieces."""
-        #TODO: This method is the same as for the general (at this time of
-        # writing). May want to reduce repetition
         hyp_moves = {}
         color = self.get_piece_id()[0]  # 'b' or 'r'
 
@@ -1500,8 +1500,6 @@ class Soldier(Piece):
             destination = next_position()
             if destination is not None:
                 hyp_moves[destination] = []
-                #TODO: may not want to use dictionary for soldiers, generals,
-                # and guards, which never have intermediates
 
         # soldiers can move diagonally forward in the palace
         position = self.get_position()
@@ -1535,222 +1533,6 @@ def main():
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
     """
-    """
-    game = JanggiGame()
-    board = game.get_board()
-
-    # bs03 to e4
-    game.make_move('e7', 'e6')
-    game.make_move('e2', 'e2')
-    game.make_move('e6', 'e5')
-    game.make_move('e2', 'e2')
-    game.make_move('e5', 'e4')
-    game.make_move('e2', 'e2')
-
-    # bch1 to d8
-    game.make_move('a10', 'a9')
-    game.make_move('e1', 'e1')
-    game.make_move('a9', 'd9')
-    game.make_move('e1', 'e1')
-    game.make_move('d9', 'd8')
-    game.make_move('e1', 'e1')
-
-    # bso2 to e7
-    game.make_move('c7', 'd7')
-    game.make_move('e1', 'e1')
-    game.make_move('d7', 'e7')
-
-    # rch2 to g2
-    game.make_move('i1', 'i2')
-    game.make_move('b2', 'b2')
-    game.make_move('i2', 'g2')
-    # bca1 to e8
-    game.make_move('b8', 'e8')
-
-    # rso5 to h4
-    game.make_move('i4', 'h4')
-    game.make_move('g2', 'g2')
-
-    # rca2 to h5
-    game.make_move('h3', 'h5')
-
-    # bch2 to g8
-    game.make_move('i10', 'i9')
-    game.make_move('e2', 'e2')
-    game.make_move('i9', 'g9')
-    game.make_move('e2', 'e2')
-    game.make_move('g9', 'g8')
-    game.make_move('e2', 'e2')
-
-    # bca2 to f8
-    game.make_move('h8', 'f8')
-
-    # rgu2 to e1
-    game.make_move('f1', 'e1')
-
-    # bso3 to f3
-    # checkmate: bca1 is checking by jumping bso2, rge1 can't move
-    game.make_move('e4', 'f4')
-    board.display_board()
-
-    # CANNON WITH BS02 JUMP
-    game = JanggiGame()
-    board = game.get_board()
-
-    # bs03 to d2
-    game.make_move('e7', 'e6')
-    game.make_move('e2', 'e2')
-    game.make_move('e6', 'e5')
-    game.make_move('e2', 'e2')
-    game.make_move('e5', 'e4')
-    game.make_move('e2', 'e2')
-    game.make_move('e4', 'd4')
-    game.make_move('e2', 'e2')
-    game.make_move('d4', 'c4')
-    game.make_move('e2', 'e2')
-
-    # bch1 to d8
-    game.make_move('a10', 'a9')
-    game.make_move('e2', 'e2')
-    game.make_move('a9', 'd9')
-    game.make_move('e2', 'e2')
-    game.make_move('d9', 'd8')
-
-    # rch2 to g2
-    game.make_move('i1', 'i2')
-    game.make_move('e9', 'e9')
-    game.make_move('i2', 'g2')
-    game.make_move('e9', 'e9')
-
-    # rso5 to h4
-    game.make_move('i4', 'h4')
-    game.make_move('e9', 'e9')
-
-    # rca2 to h5
-    game.make_move('h3', 'h5')
-
-    # bch2 to g8
-    game.make_move('i10', 'i9')
-    game.make_move('e2', 'e2')
-    game.make_move('i9', 'g9')
-    game.make_move('e2', 'e2')
-    game.make_move('g9', 'g8')
-    game.make_move('e2', 'e2')
-
-    # bca2 to f8
-    game.make_move('h8', 'f8')
-
-    # rgu2 to e1
-    game.make_move('f1', 'e1')
-
-    # bso4 to f7
-    game.make_move('g7', 'f7')
-
-    # rso4 to e4
-    game.make_move('g4', 'f4')
-    game.make_move('e9', 'e9')
-    game.make_move('f4', 'e4')
-
-    # bca1 to e8
-    # check
-    game.make_move('b8', 'e8')
-
-    # rso4 back to g4
-    game.make_move('e4', 'f4')
-    game.make_move('e9', 'e9')
-    game.make_move('f4', 'g4')
-
-    # bso2 to e7
-    game.make_move('c7', 'd7')
-    game.make_move('e2', 'e2')
-    # checkmate
-    game.make_move('d7', 'e7')
-
-    board.display_board()
-
-    """
-    # Soldier causes checkmate; can't be captured by general because
-    # it's covered by an elephant
-    game = JanggiGame()
-    board = game.get_board()
-
-    # bs03 to d2
-    game.make_move('e7', 'e6')
-    game.make_move('e2', 'e2')
-    game.make_move('e6', 'e5')
-    game.make_move('e2', 'e2')
-    game.make_move('e5', 'e4')
-    game.make_move('e2', 'e2')
-    game.make_move('e4', 'd4')
-    game.make_move('e2', 'e2')
-    game.make_move('d4', 'c4')
-    game.make_move('e2', 'e2')
-
-    # bch1 to d7
-    game.make_move('a10', 'a9')
-    game.make_move('e2', 'e2')
-    game.make_move('a9', 'd9')
-    game.make_move('e2', 'e2')
-    game.make_move('d9', 'd8')
-    game.make_move('e2', 'e2')
-    game.make_move('d8', 'd7')
-    game.make_move('e2', 'e2')
-    game.make_move('d7', 'd6')
-
-    # rch2 to g2
-    game.make_move('i1', 'i2')
-    game.make_move('e9', 'e9')
-    game.make_move('i2', 'g2')
-    game.make_move('e9', 'e9')
-
-    # rso5 to h4
-    game.make_move('i4', 'h4')
-    game.make_move('e9', 'e9')
-
-    # rca2 to h5
-    game.make_move('h3', 'h5')
-
-    # bch2 to g8
-    game.make_move('i10', 'i9')
-    game.make_move('e2', 'e2')
-    game.make_move('i9', 'g9')
-    game.make_move('e2', 'e2')
-    game.make_move('g9', 'g8')
-    game.make_move('e2', 'e2')
-
-    # bca2 to f8
-    game.make_move('h8', 'f8')
-
-    # rgu2 to e1
-    game.make_move('f1', 'e1')
-
-    # bso4 to f7
-    game.make_move('g7', 'f7')
-
-    # bso5 to i6
-    game.make_move('e2', 'e2')
-    game.make_move('i7', 'i6')
-
-    # bel2 to b5
-    game.make_move('e2', 'e2')
-    game.make_move('g10', 'i7')
-    game.make_move('e2', 'e2')
-    game.make_move('i7', 'f5')
-    game.make_move('e2', 'e2')
-    game.make_move('f5', 'd8')
-    game.make_move('e2', 'e2')
-    game.make_move('d8', 'b5')
-
-    # bso3 to e3
-    game.make_move('e2', 'e2')
-    game.make_move('c4', 'd4')
-    game.make_move('e2', 'e2')
-    game.make_move('d4', 'e4')
-    game.make_move('e2', 'e2')
-    # checkmate
-    game.make_move('e4', 'e3')
-
-    board.display_board()
 
 if __name__ == '__main__':
     main()
