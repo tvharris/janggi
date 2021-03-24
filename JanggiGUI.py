@@ -11,13 +11,22 @@ fps = 30
 width, height = 900, 1000
 rows, cols = 10, 9
 board_size = width//cols
-screen = pygame.display.set_mode((width, height))  # create window
+screen = pygame.display.set_mode((width, height+50))  # create window
 pygame.display.set_caption('Janggi')
 
 board_img = pygame.image.load('images/board.png')  # returns a Surface
 board_img.convert_alpha()  # per-pixel transparency
 board_rect = board_img.get_rect()  # get Rect for storing coordinates
 board_rect.center = width // 2, height // 2  # center the image
+
+# display text on screen
+font = pygame.font.Font(None, 44)
+red = (200, 0, 0)
+blue = (0, 0, 150)
+green = (0, 255, 0)
+grey = (200, 200, 200)
+text_surface = font.render("Blue player's turn", True, blue)
+text_xy = (10, 1010)
 
 # load images
 bca_img = pygame.image.load('images/blue_cannon.png')
@@ -91,14 +100,13 @@ def id_to_allowed_destinations(piece_id):
 def draw_allowed_destinations(piece_id):
     """Takes a piece_id and draws circles at the positions that the piece is
     allowed to move to."""
-    rgb = (0, 255, 0)
     size = 10
     allowed_destinations = id_to_allowed_destinations(piece_id)
 
     for position in allowed_destinations:
         xy = position_to_xy(position)
         xy_shifted = (xy[0] + 60, xy[1] + 53)
-        pygame.draw.circle(screen, rgb, xy_shifted, size)
+        pygame.draw.circle(screen, green, xy_shifted, size)
 
 # game loop
 piece_selected = False
@@ -125,7 +133,9 @@ while running:
                 piece_selected = False
                 game.make_move(from_pos, to_pos)
 
-    screen.fill((150,150,150))  # background color
+    screen.fill(grey)  # text background
+    screen.blit(text_surface, text_xy)
+
     screen.blit(board_img, board_rect)  # draw the board
     draw_pieces()
 
