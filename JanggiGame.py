@@ -1123,15 +1123,19 @@ class Cannon(Piece):
         # prevent iterating through already eliminated moves
         hyp_moves = allowed_moves.copy()
 
-        # eliminate moves with >1 occupied intermediate position
-        # and those with only 1 if it is a cannon
+        # Eliminate moves with >1 occupied intermediate position
+        # and those with only 1 if it is a cannon.
+        # Also eliminate if the 1 piece is a general, because the purpose
+        # of allowed_palace_destinations is for the general to see where it
+        # can go. The general should be able to move away from a cannon even if
+        # the cannon can jump it.
         for destination, intermediates in hyp_moves.items():
             num_intermediate_pieces = 0  # initialize counter
             for intermediate in intermediates:
                 piece_id_at_intermediate = board.get_occupation(intermediate)
                 if piece_id_at_intermediate is not None:
                     num_intermediate_pieces += 1
-                    if piece_id_at_intermediate[1:3] == 'ca' or \
+                    if piece_id_at_intermediate[1:3] in ['ca', 'ge'] or \
                             num_intermediate_pieces > 1:
                         if destination in allowed_moves:  # not yet deleted
                             del allowed_moves[destination]
