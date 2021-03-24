@@ -39,6 +39,7 @@ class JanggiGame:
         self._board = Board()
         self._red_player = Player('red', self._board)
         self._blue_player = Player('blue', self._board)
+        self.update_generals()  # initialize general's allowed moves
 
     def get_turn(self):
         """Returns the turn (str), which may be 'blue' or 'red' depending on
@@ -207,10 +208,6 @@ class JanggiGame:
         if self.get_game_state() != 'UNFINISHED':
             print('The game is already finished.')
             return False
-
-        # if this is the first turn, initialize the generals' allowed moves
-        if self.get_num_turns() == 0:
-            self.update_generals()
 
         # allow passing turns
         color = self.get_turn()
