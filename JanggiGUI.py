@@ -143,24 +143,45 @@ def is_own_piece(piece_id):
 
 def id_to_allowed_destinations(piece_id):
     """Takes a piece_id and returns a list of positions (strings) that the piece
-    is 'allowed' to move to. These 'allowed' destinations for pieces other than
-    generals will include those that put or leave the general in check, which
-    are actually not allowed."""
+    is allowed to move to."""
     # get piece object
     piece = game.get_current_player().get_pieces()[piece_id]
 
-    # return list of allowed destinations
-    return piece.get_allowed_moves().keys()
+    # get "allowed" moves, which include those that put or leave the player
+    # in check
+    allowed_moves = piece.get_allowed_moves()
 
-def draw_allowed_destinations(piece_id):
+    # allowed_destinations are those that are truly legal
+    allowed_destinations = []
+
+    # build allowed_destinations by excluding moves from allowed_moves that put
+    # or leave the player in check
+    # each "allowed" move is attempted and undone
+    for position in allowed_moves.keys():
+        captured_piece_id = board.get_occupation(position)
+        if captured_piece_id == '----':  # no capture
+            if game.make_move(from_pos, position):
+                game.next_turn()  # because make_move changes the turn
+                game.undo_move(from_pos, position, None)
+                allowed_destinations.append(position)
+        else:
+            if game.make_move(from_pos, position):
+                game.next_turn()
+                game.undo_move(from_pos, position, captured_piece_id)
+                allowed_destinations.append(position)
+
+    # return list of allowed destinations
+    return allowed_destinations
+
+def draw_allowed_destinations(allowed_destinations):
     """Takes a piece_id and draws circles at the positions that the piece is
     allowed to move to."""
     size = round(scale_factor * 10)
-    allowed_destinations = id_to_allowed_destinations(piece_id)
 
     for position in allowed_destinations:
         xy = position_to_xy(position)
-        xy_shifted = (xy[0] + round(scale_factor * 60), xy[1] + round(scale_factor * 53))
+        xy_shifted = (xy[0] + round(scale_factor * 60),
+                      xy[1] + round(scale_factor * 53))
         pygame.draw.circle(screen, green, xy_shifted, size)
 
 def highlight_selected(position):
@@ -201,6 +222,10 @@ while running:
                     selected_piece_id = board.get_occupation(from_pos)
                     if is_own_piece(selected_piece_id):
                         piece_selected = True
+
+                        # get allowed destinations here so it only has to be
+                        # done once when a piece is selected
+                        allowed_destinations = id_to_allowed_destinations(selected_piece_id)
                 else:
                     to_xy = mouse_pos
                     to_pos = xy_to_position(to_xy)
@@ -220,7 +245,7 @@ while running:
 
     if piece_selected:
         highlight_selected(from_pos)
-        draw_allowed_destinations(selected_piece_id)
+        draw_allowed_destinations(allowed_destinations)
 
     pygame.display.flip()  # update the display (#TODO could use display.update())
 
