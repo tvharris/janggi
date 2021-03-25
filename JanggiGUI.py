@@ -30,7 +30,9 @@ red = (200, 0, 0)
 blue = (0, 0, 150)
 green = (0, 255, 0)
 grey = (200, 200, 200)
+dark_grey = (100, 100, 100)
 black = (0, 0, 0)
+white = (255, 255, 255)
 yellow = (230, 230, 0)
 
 # load piece and board images as Surfaces
@@ -47,6 +49,14 @@ for surface_name, surface in images.items():
                         (round(scale_factor * surface.get_width()),
                          round(scale_factor * surface.get_height())))
     images[surface_name] = scaled_surface
+
+# create pass button
+pass_button_x = scale_factor * 406
+pass_button_y = scale_factor * 1005
+pass_button_width = scale_factor * 80
+pass_button_height = scale_factor * 40
+pass_button = pygame.Rect(pass_button_x, pass_button_y, pass_button_width, pass_button_height)
+pass_button_text = font.render('Pass', True, white)
 
 def draw_game_state():
     """Displays text indicating whose turn it is or who won the game."""
@@ -85,6 +95,15 @@ def draw_check():
         pygame.draw.rect(screen, yellow, text_box)
         text_surface = font.render("Check!", True, black)
         screen.blit(text_surface, text_xy)
+
+def draw_pass_button():
+    """Displays the pass button."""
+    text_xy = (pass_button_x + round(scale_factor * 5),
+    round(scale_factor * (full_height + 10)))
+
+    pygame.draw.rect(screen, dark_grey, pass_button)
+    screen.blit(pass_button_text, text_xy)
+
 
 def position_to_xy(position):
     """Takes a position (str) and returns a tuple of x, y coordinates indicating
@@ -157,21 +176,35 @@ while running:
             running = False
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if not piece_selected:
-                from_xy = pygame.mouse.get_pos()
-                from_pos = xy_to_position(from_xy)
-                selected_piece_id = board.get_occupation(from_pos)
-                if is_own_piece(selected_piece_id):
-                    piece_selected = True
-            else:
-                to_xy = pygame.mouse.get_pos()
-                to_pos = xy_to_position(to_xy)
-                piece_selected = False
-                game.make_move(from_pos, to_pos)
+            mouse_pos = pygame.mouse.get_pos()
+
+            if pass_button.collidepoint(mouse_pos):
+                color = game.get_turn()
+                in_check = game.is_in_check(color)
+                if not in_check:
+                    piece_selected = False
+                    game.next_turn()
+
+            elif mouse_pos[1] < height:
+                if not piece_selected:
+                    from_xy = mouse_pos
+                    from_pos = xy_to_position(from_xy)
+                    selected_piece_id = board.get_occupation(from_pos)
+                    if is_own_piece(selected_piece_id):
+                        piece_selected = True
+                else:
+                    to_xy = mouse_pos
+                    to_pos = xy_to_position(to_xy)
+                    piece_selected = False
+                    if from_pos != to_pos:
+                        game.make_move(from_pos, to_pos)
 
     screen.fill(grey)  # text background
+    draw_pass_button()
     draw_game_state()  # display text indicating whose turn or who won
-    draw_check()  # display text indicating that a player is in check
+
+    # determine if player is in check and display text if so
+    draw_check()
 
     screen.blit(images['board_img'], (0, 0))  # draw the board
     draw_pieces()
