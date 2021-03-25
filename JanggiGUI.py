@@ -10,39 +10,66 @@ fps = 30
 
 width, height = 900, 1000
 rows, cols = 10, 9
-board_size = width//cols
-screen = pygame.display.set_mode((width, height+50))  # create window
-pygame.display.set_caption('Janggi')
+text_box_size = 50  # height of screen space below board for displaying text
+screen = pygame.display.set_mode((width, height + text_box_size))  # create window
+pygame.display.set_caption('Janggi')  # window title
 
-board_img = pygame.image.load('images/board.png')  # returns a Surface
-board_img.convert_alpha()  # per-pixel transparency
-board_rect = board_img.get_rect()  # get Rect for storing coordinates
-board_rect.center = width // 2, height // 2  # center the image
+board_img = pygame.image.load('images/board.png').convert()  # returns a Surface
+#board_img = pygame.transform.smoothscale(board_img, (450, 500))
+#board_rect = board_img.get_rect()  # get Rect for storing coordinates
+#board_rect.center = width // 2, height // 2  # center the image
 
-# display text on screen
+# define colors and font
 font = pygame.font.Font(None, 44)
 red = (200, 0, 0)
 blue = (0, 0, 150)
 green = (0, 255, 0)
 grey = (200, 200, 200)
-text_surface = font.render("Blue player's turn", True, blue)
-text_xy = (10, 1010)
+black = (0, 0, 0)
 
 # load images
-bca_img = pygame.image.load('images/blue_cannon.png')
-bch_img = pygame.image.load('images/blue_chariot.png')
-bel_img = pygame.image.load('images/blue_elephant.png')
-bge_img = pygame.image.load('images/blue_general.png')
-bgu_img = pygame.image.load('images/blue_guard.png')
-bho_img = pygame.image.load('images/blue_horse.png')
-bso_img = pygame.image.load('images/blue_soldier.png')
-rca_img = pygame.image.load('images/red_cannon.png')
-rch_img = pygame.image.load('images/red_chariot.png')
-rel_img = pygame.image.load('images/red_elephant.png')
-rge_img = pygame.image.load('images/red_general.png')
-rgu_img = pygame.image.load('images/red_guard.png')
-rho_img = pygame.image.load('images/red_horse.png')
-rso_img = pygame.image.load('images/red_soldier.png')
+bca_img = pygame.image.load('images/blue_cannon.png').convert()
+bch_img = pygame.image.load('images/blue_chariot.png').convert()
+bel_img = pygame.image.load('images/blue_elephant.png').convert()
+bge_img = pygame.image.load('images/blue_general.png').convert()
+bgu_img = pygame.image.load('images/blue_guard.png').convert()
+bho_img = pygame.image.load('images/blue_horse.png').convert()
+bso_img = pygame.image.load('images/blue_soldier.png').convert()
+rca_img = pygame.image.load('images/red_cannon.png').convert()
+rch_img = pygame.image.load('images/red_chariot.png').convert()
+rel_img = pygame.image.load('images/red_elephant.png').convert()
+rge_img = pygame.image.load('images/red_general.png').convert()
+rgu_img = pygame.image.load('images/red_guard.png').convert()
+rho_img = pygame.image.load('images/red_horse.png').convert()
+rso_img = pygame.image.load('images/red_soldier.png').convert()
+
+def draw_game_state():
+    """Displays text indicating whose turn it is or who won the game."""
+    text_xy = (10, height + 10)
+    game_state = game.get_game_state()
+
+    if game_state == 'UNFINISHED':
+        if game.get_turn() == 'blue':
+            text_surface = font.render("Blue player's turn", True, blue)
+        else:
+            text_surface = font.render("Red player's turn", True, red)
+
+    elif game_state == 'BLUE_WON':
+        text_surface = font.render("Checkmate! Blue player won!", True, blue)
+
+    else:
+        text_surface = font.render("Checkmate! Red player won!", True, red)
+
+    screen.blit(text_surface, text_xy)
+
+def draw_check():
+    """Displays text indicating that a player is in check."""
+    text_xy = (width - 120, height + 10)
+
+    if game.is_in_check(game.get_turn()):
+        text_surface = font.render("Check!", True, black)
+
+        screen.blit(text_surface, text_xy)
 
 def position_to_xy(position):
     """Takes a position (str) and returns a tuple of x, y coordinates indicating
@@ -80,7 +107,7 @@ def draw_pieces():
 
 def is_own_piece(piece_id):
     """Takes a piece_id and returns True if it belongs to the player whose turn
-    it is."""
+    it is, otherwise returns False."""
     pieces_dict = game.get_current_player().get_pieces()
     if piece_id in pieces_dict:
         return True
@@ -88,9 +115,9 @@ def is_own_piece(piece_id):
 
 def id_to_allowed_destinations(piece_id):
     """Takes a piece_id and returns a list of positions (strings) that the piece
-    is allowed to move to."""
-    #    pieces_dict = game.get_current_player().get_pieces()
-    #    if piece_id in pieces_dict:
+    is 'allowed' to move to. These 'allowed' destinations for pieces other than
+    generals will include those that put or leave the general in check, which
+    are actually not allowed."""
     # get piece object
     piece = game.get_current_player().get_pieces()[piece_id]
 
@@ -134,9 +161,11 @@ while running:
                 game.make_move(from_pos, to_pos)
 
     screen.fill(grey)  # text background
-    screen.blit(text_surface, text_xy)
+    draw_game_state()  # display text indicating whose turn or who won
+    draw_check()  # display text indicating that a player is in check
 
-    screen.blit(board_img, board_rect)  # draw the board
+    #screen.blit(board_img, board_rect)  # draw the board
+    screen.blit(board_img, (0, 0))  # draw the board
     draw_pieces()
 
     if piece_selected:
