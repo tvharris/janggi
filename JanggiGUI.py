@@ -1,5 +1,6 @@
 from JanggiGame import *
 import pygame
+import os
 
 game = JanggiGame()
 board = game.get_board()
@@ -23,10 +24,6 @@ text_box_size = round(scale_factor * full_text_box_size)
 screen = pygame.display.set_mode((width, height + text_box_size))
 pygame.display.set_caption('Janggi')  # window title
 
-# load the image as a Surface
-board_img = pygame.image.load('images/board.png').convert()
-board_img = pygame.transform.smoothscale(board_img, (width, height))
-
 # define colors and font
 font = pygame.font.Font(None, round(scale_factor * 44))
 red = (200, 0, 0)
@@ -35,37 +32,20 @@ green = (0, 255, 0)
 grey = (200, 200, 200)
 black = (0, 0, 0)
 
-# load images as Surfaces
-bca_img = pygame.image.load('images/blue_cannon.png').convert_alpha()
-bch_img = pygame.image.load('images/blue_chariot.png').convert_alpha()
-bel_img = pygame.image.load('images/blue_elephant.png').convert_alpha()
-bge_img = pygame.image.load('images/blue_general.png').convert_alpha()
-bgu_img = pygame.image.load('images/blue_guard.png').convert_alpha()
-bho_img = pygame.image.load('images/blue_horse.png').convert_alpha()
-bso_img = pygame.image.load('images/blue_soldier.png').convert_alpha()
-rca_img = pygame.image.load('images/red_cannon.png').convert_alpha()
-rch_img = pygame.image.load('images/red_chariot.png').convert_alpha()
-rel_img = pygame.image.load('images/red_elephant.png').convert_alpha()
-rge_img = pygame.image.load('images/red_general.png').convert_alpha()
-rgu_img = pygame.image.load('images/red_guard.png').convert_alpha()
-rho_img = pygame.image.load('images/red_horse.png').convert_alpha()
-rso_img = pygame.image.load('images/red_soldier.png').convert_alpha()
+# load piece and board images as Surfaces
+images = {}
+image_dir = 'images/'
+for image in os.listdir(image_dir):
+    surface_name = image[:-4] + '_img'
+    if os.path.isfile(image_dir + image):
+        images[surface_name] = pygame.image.load(image_dir + image).convert_alpha()
 
 # scale Surfaces
-bca_img = pygame.transform.smoothscale(bca_img, (round(scale_factor * bca_img.get_width()), round(scale_factor * bca_img.get_height())))
-bch_img = pygame.transform.smoothscale(bch_img, (round(scale_factor * bch_img.get_width()), round(scale_factor * bch_img.get_height())))
-bel_img = pygame.transform.smoothscale(bel_img, (round(scale_factor * bel_img.get_width()), round(scale_factor * bel_img.get_height())))
-bge_img = pygame.transform.smoothscale(bge_img, (round(scale_factor * bge_img.get_width()), round(scale_factor * bge_img.get_height())))
-bgu_img = pygame.transform.smoothscale(bgu_img, (round(scale_factor * bgu_img.get_width()), round(scale_factor * bgu_img.get_height())))
-bho_img = pygame.transform.smoothscale(bho_img, (round(scale_factor * bho_img.get_width()), round(scale_factor * bho_img.get_height())))
-bso_img = pygame.transform.smoothscale(bso_img, (round(scale_factor * bso_img.get_width()), round(scale_factor * bso_img.get_height())))
-rca_img = pygame.transform.smoothscale(rca_img, (round(scale_factor * rca_img.get_width()), round(scale_factor * rca_img.get_height())))
-rch_img = pygame.transform.smoothscale(rch_img, (round(scale_factor * rch_img.get_width()), round(scale_factor * rch_img.get_height())))
-rel_img = pygame.transform.smoothscale(rel_img, (round(scale_factor * rel_img.get_width()), round(scale_factor * rel_img.get_height())))
-rge_img = pygame.transform.smoothscale(rge_img, (round(scale_factor * rge_img.get_width()), round(scale_factor * rge_img.get_height())))
-rgu_img = pygame.transform.smoothscale(rgu_img, (round(scale_factor * rgu_img.get_width()), round(scale_factor * rgu_img.get_height())))
-rho_img = pygame.transform.smoothscale(rho_img, (round(scale_factor * rho_img.get_width()), round(scale_factor * rho_img.get_height())))
-rso_img = pygame.transform.smoothscale(rso_img, (round(scale_factor * rso_img.get_width()), round(scale_factor * rso_img.get_height())))
+for surface_name, surface in images.items():
+    scaled_surface = pygame.transform.smoothscale(surface,
+                        (round(scale_factor * surface.get_width()),
+                         round(scale_factor * surface.get_height())))
+    images[surface_name] = scaled_surface
 
 def draw_game_state():
     """Displays text indicating whose turn it is or who won the game."""
@@ -116,8 +96,8 @@ def xy_to_position(xy):
 
 def id_to_img(piece_id):
     """Takes a piece_id and returns the Surface object for the piece's image."""
-    img_string = piece_id[:3] + '_img'
-    return globals()[img_string]
+    surface_name = piece_id[:3] + '_img'
+    return images[surface_name]
 
 def draw_pieces():
     """Draws the pieces on the board according to the current state of the game."""
@@ -184,7 +164,7 @@ while running:
     draw_game_state()  # display text indicating whose turn or who won
     draw_check()  # display text indicating that a player is in check
 
-    screen.blit(board_img, (0, 0))  # draw the board
+    screen.blit(images['board_img'], (0, 0))  # draw the board
     draw_pieces()
 
     if piece_selected:
