@@ -71,10 +71,10 @@ def draw_game_state():
             text_surface = font.render("Red player's turn", True, red)
 
     elif game_state == 'BLUE_WON':
-        text_surface = font.render("Checkmate! Blue player won!", True, blue)
+        text_surface = font.render("Checkmate! Blue won!", True, blue)
 
     else:
-        text_surface = font.render("Checkmate! Red player won!", True, red)
+        text_surface = font.render("Checkmate! Red won!", True, red)
 
     screen.blit(text_surface, text_xy)
 
@@ -163,6 +163,15 @@ def draw_allowed_destinations(piece_id):
         xy_shifted = (xy[0] + round(scale_factor * 60), xy[1] + round(scale_factor * 53))
         pygame.draw.circle(screen, green, xy_shifted, size)
 
+def highlight_selected(position):
+    """Takes the position of a piece to be highlighted and draws a circle
+    around it."""
+    xy = position_to_xy(position)
+    xy_shifted = (xy[0] + round(scale_factor * 60), xy[1] + round(scale_factor * 53))
+    size = round(scale_factor * 55)
+    thickness = round(scale_factor * 3)
+    pygame.draw.circle(screen, green, xy_shifted, size, thickness)
+
 # game loop
 piece_selected = False
 running = True
@@ -210,6 +219,7 @@ while running:
     draw_pieces()
 
     if piece_selected:
+        highlight_selected(from_pos)
         draw_allowed_destinations(selected_piece_id)
 
     pygame.display.flip()  # update the display (#TODO could use display.update())
