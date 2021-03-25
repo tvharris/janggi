@@ -31,6 +31,7 @@ blue = (0, 0, 150)
 green = (0, 255, 0)
 grey = (200, 200, 200)
 black = (0, 0, 0)
+yellow = (230, 230, 0)
 
 # load piece and board images as Surfaces
 images = {}
@@ -72,9 +73,17 @@ def draw_check():
     text_xy = (round(scale_factor * (full_width - 120)),
                round(scale_factor * (full_height + 10)))
 
-    if game.is_in_check(game.get_turn()):
-        text_surface = font.render("Check!", True, black)
+    # create filled rectangular background for text
+    box_x = scale_factor * 770
+    box_y = scale_factor * 1005
+    box_width = scale_factor * 125
+    box_height = scale_factor * 40
+    text_box = pygame.Rect(box_x, box_y, box_width, box_height)
 
+    # draw the rectangle and text
+    if game.is_in_check(game.get_turn()):
+        pygame.draw.rect(screen, yellow, text_box)
+        text_surface = font.render("Check!", True, black)
         screen.blit(text_surface, text_xy)
 
 def position_to_xy(position):
@@ -127,7 +136,7 @@ def id_to_allowed_destinations(piece_id):
 def draw_allowed_destinations(piece_id):
     """Takes a piece_id and draws circles at the positions that the piece is
     allowed to move to."""
-    size = 10
+    size = round(scale_factor * 10)
     allowed_destinations = id_to_allowed_destinations(piece_id)
 
     for position in allowed_destinations:
