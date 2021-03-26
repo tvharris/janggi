@@ -838,12 +838,17 @@ class Piece:
         red_palace = {'d1', 'e1', 'f1', 'd2', 'e2', 'f2', 'd3', 'e3', 'f3'}
         blue_palace = {'d8', 'e8', 'f8', 'd9', 'e9', 'f9', 'd10', 'e10', 'f10'}
 
-        # eliminate moves with an occupied intermediate position
+        # eliminate moves with an occupied intermediate position unless the
+        # general is the intermediate, because the general uses this info
+        # to determine where it can't move, and it shouldn't be able to move
+        # away from, say, a chariot that has it in check
         for destination, intermediates in hyp_moves.items():
             for intermediate in intermediates:
-                if board.get_occupation(intermediate) is not None:
-                    if destination in allowed_moves:  # not yet deleted
-                        del allowed_moves[destination]
+                piece_id_at_intermediate = board.get_occupation(intermediate)
+                if piece_id_at_intermediate is not None:
+                    if piece_id_at_intermediate[1:3] != 'ge':
+                        if destination in allowed_moves:  # not yet deleted
+                            del allowed_moves[destination]
 
         # find intersection of allowed_moves and the opposing player's palace
         if color == 'r':
