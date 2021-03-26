@@ -28,6 +28,7 @@ font = pygame.font.Font(None, round(scale_factor * 44))
 red = (200, 0, 0)
 blue = (0, 0, 150)
 green = (0, 255, 0)
+green_transp = (0, 255, 0, 50)
 grey = (200, 200, 200)
 dark_grey = (100, 100, 100)
 black = (0, 0, 0)
@@ -151,7 +152,7 @@ def id_to_allowed_destinations(piece_id):
     # in check
     allowed_moves = piece.get_allowed_moves()
 
-    # allowed_destinations are those that are truly legal
+    # allowed_destinations do not put or leave the player in check
     allowed_destinations = []
 
     # build allowed_destinations by excluding moves from allowed_moves that put
@@ -159,16 +160,10 @@ def id_to_allowed_destinations(piece_id):
     # each "allowed" move is attempted and undone
     for position in allowed_moves.keys():
         captured_piece_id = board.get_occupation(position)
-        if captured_piece_id == '----':  # no capture
-            if game.make_move(from_pos, position):
-                game.next_turn()  # because make_move changes the turn
-                game.undo_move(from_pos, position, None)
-                allowed_destinations.append(position)
-        else:
-            if game.make_move(from_pos, position):
-                game.next_turn()
-                game.undo_move(from_pos, position, captured_piece_id)
-                allowed_destinations.append(position)
+        if game.make_move(from_pos, position):
+            game.next_turn()
+            game.undo_move(from_pos, position, captured_piece_id)
+            allowed_destinations.append(position)
 
     # return list of allowed destinations
     return allowed_destinations
@@ -188,10 +183,15 @@ def highlight_selected(position):
     """Takes the position of a piece to be highlighted and draws a circle
     around it."""
     xy = position_to_xy(position)
-    xy_shifted = (xy[0] + round(scale_factor * 60), xy[1] + round(scale_factor * 53))
+    xy_shifted = (xy[0] + round(scale_factor * 5), xy[1] - round(scale_factor * 2))
+    surface_dimensions = (round(scale_factor * 110), round(scale_factor * 110))
+    circle_xy = tuple([int(0.5 * dim) for dim in surface_dimensions])
     size = round(scale_factor * 55)
-    thickness = round(scale_factor * 3)
-    pygame.draw.circle(screen, green, xy_shifted, size, thickness)
+
+    circle_surface = pygame.Surface(surface_dimensions, pygame.SRCALPHA)
+    pygame.draw.circle(circle_surface, green_transp, circle_xy, size)
+    screen.blit(circle_surface, xy_shifted)
+
 
 # game loop
 piece_selected = False
@@ -246,6 +246,7 @@ while running:
     if piece_selected:
         highlight_selected(from_pos)
         draw_allowed_destinations(allowed_destinations)
+
 
     pygame.display.flip()  # update the display (#TODO could use display.update())
 
