@@ -169,8 +169,8 @@ def id_to_allowed_destinations(piece_id):
     return allowed_destinations
 
 def draw_allowed_destinations(allowed_destinations):
-    """Takes a piece_id and draws circles at the positions that the piece is
-    allowed to move to."""
+    """Takes a piece_id and draws filled, transparent circles at the positions
+    that the piece is allowed to move to."""
     size = round(scale_factor * 10)
 
     for position in allowed_destinations:
@@ -185,11 +185,11 @@ def highlight_selected(position):
     xy = position_to_xy(position)
     xy_shifted = (xy[0] + round(scale_factor * 5), xy[1] - round(scale_factor * 2))
     surface_dimensions = (round(scale_factor * 110), round(scale_factor * 110))
-    circle_xy = tuple([int(0.5 * dim) for dim in surface_dimensions])
-    size = round(scale_factor * 55)
+    circle_xy = tuple([0.5 * dim for dim in surface_dimensions])
+    radius = surface_dimensions[0] // 2
 
     circle_surface = pygame.Surface(surface_dimensions, pygame.SRCALPHA)
-    pygame.draw.circle(circle_surface, green_transp, circle_xy, size)
+    pygame.draw.circle(circle_surface, green_transp, circle_xy, radius)
     screen.blit(circle_surface, xy_shifted)
 
 
