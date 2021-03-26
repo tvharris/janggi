@@ -1130,9 +1130,10 @@ class Cannon(Piece):
 
         # Eliminate moves with >1 occupied intermediate position
         # and those with only 1 if it is a cannon.
-        # Also eliminate if the 1 piece is a general, because the purpose
+        # Also eliminate if the 1 piece is a general and it's the first
+        # intermediate encountered, because the purpose
         # of allowed_palace_destinations is for the general to see where it
-        # can go. The general should be able to move away from a cannon even if
+        # can go; the general should be able to move away from a cannon even if
         # the cannon can jump it.
         for destination, intermediates in hyp_moves.items():
             num_intermediate_pieces = 0  # initialize counter
@@ -1140,7 +1141,11 @@ class Cannon(Piece):
                 piece_id_at_intermediate = board.get_occupation(intermediate)
                 if piece_id_at_intermediate is not None:
                     num_intermediate_pieces += 1
-                    if piece_id_at_intermediate[1:3] in ['ca', 'ge'] or \
+                    if piece_id_at_intermediate[1:3] == 'ge':
+                        num_intermediate_pieces -= 1
+                    if piece_id_at_intermediate[1:3] == 'ca' or \
+                            (piece_id_at_intermediate[1:3] == 'ge' and \
+                            num_intermediate_pieces == 0) or \
                             num_intermediate_pieces > 1:
                         if destination in allowed_moves:  # not yet deleted
                             del allowed_moves[destination]
@@ -1529,7 +1534,6 @@ class Soldier(Piece):
 
 def main():
     """Lets users play the game."""
-    """
     game = JanggiGame()
     board = game.get_board()
     while True:
@@ -1538,7 +1542,6 @@ def main():
         from_pos = input('Move from: ')
         to_pos = input('Move to: ')
         game.make_move(from_pos, to_pos)
-    """
 
 if __name__ == '__main__':
     main()
