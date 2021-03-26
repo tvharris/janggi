@@ -1,6 +1,5 @@
 from JanggiGame import *
-import pygame
-import os
+import pygame, os, sys
 
 game = JanggiGame()
 board = game.get_board()
@@ -37,11 +36,12 @@ yellow = (230, 230, 0)
 
 # load piece and board images as Surfaces
 images = {}
-image_dir = 'images/'
+image_dir = os.path.join(os.path.dirname(__file__), 'images')
 for image in os.listdir(image_dir):
-    surface_name = image[:-4] + '_img'
-    if os.path.isfile(image_dir + image):
-        images[surface_name] = pygame.image.load(image_dir + image).convert_alpha()
+    image_name = image[:-4] + '_img'
+    image_path = os.path.join(image_dir, image)
+    if os.path.isfile(image_path):
+        images[image_name] = pygame.image.load(image_path).convert_alpha()
 
 # scale Surfaces
 for surface_name, surface in images.items():
@@ -250,3 +250,4 @@ while running:
     pygame.display.flip()  # update the display (#TODO could use display.update())
 
 pygame.quit()
+sys.exit()
