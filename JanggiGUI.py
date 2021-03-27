@@ -193,21 +193,22 @@ def highlight_selected(position):
     screen.blit(circle_surface, xy_shifted)
 
 
-# game loop
+# set up and run game loop
 piece_selected = False
 running = True
 clock = pygame.time.Clock()  # use to set fps later
 while running:
-    clock.tick(fps)
 
     # allow close button to quit
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+        # handle mouse clicks
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
 
+            # enable pass button
             if pass_button.collidepoint(mouse_pos):
                 color = game.get_turn()
                 in_check = game.is_in_check(color)
@@ -215,7 +216,9 @@ while running:
                     piece_selected = False
                     game.next_turn()
 
-            elif mouse_pos[1] < height:
+            # handle mouse clicks on board, including piece selection and
+            # movement
+            elif mouse_pos[1] < height:  # clicked on board or piece
                 if not piece_selected:
                     from_xy = mouse_pos
                     from_pos = xy_to_position(from_xy)
@@ -225,30 +228,37 @@ while running:
 
                         # get allowed destinations here so it only has to be
                         # done once when a piece is selected
-                        allowed_destinations = id_to_allowed_destinations(selected_piece_id)
+                        allowed_destinations = id_to_allowed_destinations(
+                            selected_piece_id)
+
+                # piece is already selected
                 else:
                     to_xy = mouse_pos
                     to_pos = xy_to_position(to_xy)
+
+                    # allow clicking same piece to unselect
                     piece_selected = False
                     if from_pos != to_pos:
                         game.make_move(from_pos, to_pos)
 
-    screen.fill(grey)  # text background
-    draw_pass_button()
-    draw_game_state()  # display text indicating whose turn or who won
+    # display the text area below the board
+    screen.fill(grey)  # background color
+    draw_pass_button()  # clickable button for passing the turn
+    draw_game_state()  # text indicating whose turn or who won
 
     # determine if player is in check and display text if so
     draw_check()
 
-    screen.blit(images['board_img'], (0, 0))  # draw the board
+    # draw board and pieces
+    screen.blit(images['board_img'], (0, 0))
     draw_pieces()
 
     if piece_selected:
         highlight_selected(from_pos)
         draw_allowed_destinations(allowed_destinations)
 
-
-    pygame.display.flip()  # update the display (#TODO could use display.update())
+    pygame.display.update()
+    clock.tick(fps)
 
 pygame.quit()
 sys.exit()
