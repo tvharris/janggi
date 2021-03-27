@@ -1,7 +1,7 @@
-from JanggiGame import *
+import JanggiGame
 import pygame, os, sys
 
-game = JanggiGame()
+game = JanggiGame.JanggiGame()
 board = game.get_board()
 
 pygame.init()
