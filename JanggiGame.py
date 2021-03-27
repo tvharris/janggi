@@ -26,7 +26,7 @@ class JanggiGame:
         get_opponent, is_in_check, is_checkmate, make_move, undo_move,
         update_generals
     """
-    def __init__(self):
+    def __init__(self) -> object:
         """
         Creates a JanggiGame.
         Private data members:
@@ -1527,15 +1527,24 @@ class Soldier(Piece):
 
 
 def main():
-    """Lets users play the game."""
+    """Lets users play the game in the terminal."""
+    # initialize the game
     game = JanggiGame()
     board = game.get_board()
+
+    # game loop
     while True:
+        # display board and prompt for user input of positions
         board.display_board()
         print("%s's turn" %game.get_turn())
         from_pos = input('Move from: ')
         to_pos = input('Move to: ')
+
+        # execute the move
         game.make_move(from_pos, to_pos)
+
+        # blank line before printing board for next turn
+        print()
 
 if __name__ == '__main__':
     main()
