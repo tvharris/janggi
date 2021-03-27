@@ -1,3 +1,12 @@
+# Author: Travis Harris
+# Date: 3/27/2021
+# Description: Run this file to play two-player Janggi with a GUI. JanggiGame.py
+# should be in the same directory. Mouse clicks are used to move pieces by
+# selecting one and choosing one of the allowed destinations. Pieces can be
+# unselected by clicking them again or clicking outside of the allowed
+# destinations. A pass button is implemented for skipping turns. The screen
+# resolution can be adjusted by changing the value of BOARD_TARGET_HEIGHT.
+
 import JanggiGame
 import pygame, os, sys
 

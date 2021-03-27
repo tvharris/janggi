@@ -1,10 +1,13 @@
 # Author: Travis Harris
-# Date: 3/11/2021
+# Date: 3/27/2021
 # Description: Implementation of the board game Janggi, with a class (JanggiGame)
-# for playing the game. The game is played using the make_move method, which
-# takes the position of the piece to be moved and its destination. The game ends
-# by checkmate. Movement rules are described in the docstrings for each
-# individual piece's class, and on Wikipedia.
+# for playing the game. Other classes include Board, PLayer, Piece, and one for
+# each piece type. Running this file will start the game in terminal mode, which
+# accepts positions (e.g., a1, i10) indicating which piece to move and where to
+# move it. To run the game in GUI mode, run JanggiGUI.py instead.
+# The game ends by checkmate. Movement rules are described in the docstrings for
+# each individual piece's class, and on Wikipedia. JanggiGUI highlights allowed
+# moves, making it beginner-friendly.
 
 class JanggiGame:
     """
@@ -15,12 +18,13 @@ class JanggiGame:
     must interact with the Board and the Player to determine where the pieces
     are and what their allowed moves are. It also communicates with the Player's
     General objects because it needs to pass information from the opposing
-    Player to the General, which would not be available to the General.
+    Player to the General.
 
     Data members: See __init__
     Methods: get_game_state, set_game_state, get_turn, get_num_turns, next_turn,
-        is_in_check, is_checkmate, make_move, undo_move, update_generals,
-        get_current_player
+        get_board, get_red_player, get_blue_player, get_current_player,
+        get_opponent, is_in_check, is_checkmate, make_move, undo_move,
+        update_generals
     """
     def __init__(self):
         """
@@ -63,7 +67,7 @@ class JanggiGame:
         self._num_turns += 1
 
     def get_board(self):
-        """Returns the board dictionary."""
+        """Returns the board object."""
         return self._board
 
     def get_red_player(self):
@@ -158,7 +162,7 @@ class JanggiGame:
         # check whether all pieces with the general in check can be blocked
         # in a single move. Don't include soldiers, because they can't be
         # blocked.
-        # first, get list of path_to_general sets
+        # First, get list of path_to_general sets
         path_to_general_sets = [piece.get_path_to_general() for piece in
                            pieces_checking if piece.get_piece_id()[1:3] != 'so']
 
@@ -188,9 +192,6 @@ class JanggiGame:
             (e.g., 'b3')
         Returns: True if the move is allowed, otherwise False.
         """
-        # Getting Gradescope tests:
-        print("make_move(", from_pos, ",", to_pos, ")")
-
         # input validation
         for pos in [from_pos, to_pos]:
             if pos == '':
@@ -376,13 +377,13 @@ class Board:
     """
     Represents a Janggi board.
     This class keeps track of the positions of all pieces and can be used to
-    print the board. This class is created by the JanggiGame and is passed to
-    the Player's and the Pieces because they all need access in order to see
+    print the board. A Board object is created by the JanggiGame and is passed
+    to the Players and the Pieces because they all need access in order to see
     what Piece is in a given position.
 
     Data members: See __init__
     Methods: get_general_position, set_general_position, move_piece, get_board,
-        display_board, get_occupation, set_occupation
+        display_board, get_occupation, set_occupation, clear_position,
     """
     def __init__(self):
         """
@@ -392,7 +393,7 @@ class Board:
                 all positions on a Janggi board. The board is initialized with
                 the pieces in their starting positions for a Janggi game.
             general_position: dictionary organized as
-            {color (str): position (str)}
+                {color (str): position (str)}
         """
         self._general_position = {'red': 'e2', 'blue': 'e9'}
         self._board = {'a1': 'rch1', 'b1': 'rel1', 'c1': 'rho1', 'd1': 'rgu1', 'e1': '----',
@@ -482,15 +483,6 @@ class Board:
 
     def display_board(self):
         """Displays the board with the pieces in their current positions."""
-
-        # testing printing without pieces
-        #print('     a    b    c    d    e    f    g    h    i\n'
-        #      '1    +----+----+----+----+----+----+----+----+\n'
-        #      '     |    |    |    |  \ | /  |    |    |    |\n'
-        #      '2    +----+----+----+----+----+----+----+----+\n'
-        #      '     |    |    |    |  / | \  |    |    |    |\n'
-        #      '10   +----+----+----+----+----+----+----+----+')
-
         board = self.get_board()
 
         # print board with pieces
@@ -532,18 +524,18 @@ class Board:
 class Player:
     """
     Represents a Janggi player.
-    There are two Players in the game. They each have a set of Piece objects
-    which they initialize in their starting positions. The Player has a method
-    to make all of its Pieces update their data members based on the current
-    state of the board. The Player keeps sets of allowed_destinations which
-    are used by the JanggiGame and the opposing Player's General to determine
-    whether they are in check or checkmate. The Player is passed the Board
-    from the JanggiGame so that it can pass it on to the Pieces which need
+    There are two Players in the game. They each have a collection of Piece
+    objects which they initialize in their starting positions. The Player has a
+    method to make all of its Pieces update their data members based on the
+    current state of the board. The Player keeps sets of allowed_destinations
+    which are used by the JanggiGame and the opposing Player's General to
+    determine whether they are in check or checkmate. The Player is passed the
+    Board from the JanggiGame so that it can pass it on to the Pieces which need
     it to determine whether positions are occupied.
 
     Data members: See __init__
     Methods: get_color, get_pieces, get_pieces_checking, set_pieces_checking,
-        get_allowed_destinations, set_allowed_destinations,
+        get_board, get_allowed_destinations, set_allowed_destinations,
         get_allowed_palace_destinations, set_allowed_palace_destinations,
         add_piece, remove_piece, update_pieces, _init_pieces
     """
@@ -561,8 +553,8 @@ class Player:
                 player
             color: (str) 'blue' or 'red'
             pieces: dictionary with piece_id as keys and Piece objects as values
-            pieces_checking: list of Piece objects that have the opposing general
-                in check
+            pieces_checking: list of Piece objects that have the opposing
+                general in check
             board: Board object
         """
         self._allowed_destinations = set()
@@ -711,17 +703,16 @@ class Piece:
     """
     Represents a Janggi piece.
     This is the parent class of each type of Janggi piece. They inherit all
-    the methods and data members of this class. Pieces have methods to determine
-    their allowed moves based on the current state of the board. Thus, they
-    need to have access to the Board object, but their methods are called by
-    Player objects and themselves.
+    the methods and data members of this class. Pieces need access to the board
+    because they have methods to determine their allowed moves based on its
+    current state.
 
     Data members: See __init__
     Methods: get_position, set_position, get_hyp_moves, set_hyp_moves,
-        get_path_to_general, set_path_to_general,
-        get piece_id, get_allowed_moves, set_allowed_moves,
+        get_path_to_general, set_path_to_general, get piece_id,
+        get_allowed_moves, set_allowed_moves, update_allowed_moves,
         get_allowed_palace_destinations, set_allowed_palace_destinations,
-        get_board, is_checking, update_allowed_moves,
+        update_allowed_palace_destinations, get_board, is_checking
         position_u, position_d, position_l, position_r,
         position_ul, position_ur, position_dl, position_dr
     """
@@ -995,6 +986,7 @@ class Cannon(Piece):
     Represents a cannon, a sub-class of Piece.
     Cannons can move horizontally or vertically any number of positions, but
     they must jump exactly one other piece, which may not be another cannon.
+    They can move diagonally between corners of the palace.
 
     Data members: See __init__
     Methods: inherited methods, update_hyp_moves, and overriding versions of
@@ -1162,7 +1154,8 @@ class Chariot(Piece):
     """
     Represents a chariot, a sub-class of Piece.
     Chariots can move horizontally or vertically any number of positions, but
-    they may not jump over another piece.
+    they may not jump over another piece. They can move diagonally between
+    corners of the palace.
 
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
@@ -1286,8 +1279,8 @@ class General(Piece):
     of the palace.
 
     Data members: See __init__
-    Methods: inherited methods, overriding update_allowed_palace_destinations,
-        and update_hyp_moves
+    Methods: inherited methods, overriding update_allowed_moves, overriding
+        update_allowed_palace_destinations, and update_hyp_moves
     """
     def __init__(self, piece_id, position, board):
         """
@@ -1479,7 +1472,8 @@ class Horse(Piece):
 class Soldier(Piece):
     """
     Represents a soldier, a sub-class of Piece.
-    Soldiers can move forward or sideways one space.
+    Soldiers can move forward or sideways one space. They can also move
+    diagonally forward between corners in the palace.
 
     Data members: See __init__
     Methods: inherited methods and update_hyp_moves
