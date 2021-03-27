@@ -1,14 +1,15 @@
 import JanggiGame
 import pygame, os, sys
 
+# initialize pygame
 pygame.init()
+FPS = 30
 
 # initialize the game
 game = JanggiGame.JanggiGame()
 board = game.get_board()
 
-FPS = 30
-
+# define the screen dimensions
 # change BOARD_TARGET_HEIGHT to adjust the game resolution
 # 1000 is native and sharpest
 BOARD_TARGET_HEIGHT = 1000
@@ -38,6 +39,7 @@ WHITE = (255, 255, 255)
 YELLOW = (230, 230, 0)
 
 # load piece and board images as Surfaces
+# the images directory must be in the same directory as this file
 IMAGES = {}
 image_dir = os.path.join(os.path.dirname(__file__), 'images')
 for image in os.listdir(image_dir):
@@ -47,20 +49,21 @@ for image in os.listdir(image_dir):
         IMAGES[image_name] = pygame.image.load(image_path).convert_alpha()
 
 # scale Surfaces
-for surface_name, surface in IMAGES.items():
-    scaled_surface = pygame.transform.smoothscale(surface,
-                        (round(SCALE_FACTOR * surface.get_width()),
-                         round(SCALE_FACTOR * surface.get_height())))
-    IMAGES[surface_name] = scaled_surface
+if BOARD_TARGET_HEIGHT != 1000:
+    for surface_name, surface in IMAGES.items():
+        scaled_surface = pygame.transform.smoothscale(surface,
+                            (round(SCALE_FACTOR * surface.get_width()),
+                             round(SCALE_FACTOR * surface.get_height())))
+        IMAGES[surface_name] = scaled_surface
 
 # create pass button
-pass_button_x = SCALE_FACTOR * 406
-pass_button_y = SCALE_FACTOR * 1005
-pass_button_width = SCALE_FACTOR * 80
-pass_button_height = SCALE_FACTOR * 40
-pass_button = pygame.Rect(pass_button_x, pass_button_y, pass_button_width,
-                          pass_button_height)
-pass_button_text = FONT.render('Pass', True, WHITE)
+PASS_BUTTON_X = SCALE_FACTOR * 406
+PASS_BUTTON_Y = SCALE_FACTOR * 1005
+PASS_BUTTON_WIDTH = SCALE_FACTOR * 80
+PASS_BUTTON_HEIGHT = SCALE_FACTOR * 40
+PASS_BUTTON = pygame.Rect(PASS_BUTTON_X, PASS_BUTTON_Y, PASS_BUTTON_WIDTH,
+                          PASS_BUTTON_HEIGHT)
+PASS_BUTTON_TEXT = FONT.render('Pass', True, WHITE)
 
 def draw_game_state():
     """Displays text indicating whose turn it is or who won the game."""
@@ -102,11 +105,11 @@ def draw_check():
 
 def draw_pass_button():
     """Displays the pass button."""
-    text_xy = (pass_button_x + round(SCALE_FACTOR * 5),
+    text_xy = (PASS_BUTTON_X + round(SCALE_FACTOR * 5),
     round(SCALE_FACTOR * (FULL_HEIGHT + 10)))
 
-    pygame.draw.rect(screen, DARK_GREY, pass_button)
-    screen.blit(pass_button_text, text_xy)
+    pygame.draw.rect(screen, DARK_GREY, PASS_BUTTON)
+    screen.blit(PASS_BUTTON_TEXT, text_xy)
 
 def position_to_xy(position):
     """Takes a position (str) and returns a tuple of x, y coordinates indicating
@@ -212,7 +215,7 @@ def main():
                 mouse_pos = pygame.mouse.get_pos()
 
                 # enable pass button
-                if pass_button.collidepoint(mouse_pos):
+                if PASS_BUTTON.collidepoint(mouse_pos):
                     color = game.get_turn()
                     in_check = game.is_in_check(color)
                     if not in_check:
