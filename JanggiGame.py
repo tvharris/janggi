@@ -4,7 +4,8 @@
 # for playing the game. Other classes include Board, PLayer, Piece, and one for
 # each piece type. Running this file will start the game in terminal mode, which
 # accepts positions (e.g., a1, i10) indicating which piece to move and where to
-# move it. To run the game in GUI mode, run JanggiGUI.py instead.
+# move it. Turns can be passed by specifying the same position to move to and
+# from. To run the game in GUI mode, run JanggiGUI.py instead.
 # The game ends by checkmate. Movement rules are described in the docstrings for
 # each individual piece's class, and on Wikipedia. JanggiGUI highlights allowed
 # moves, making it beginner-friendly.
@@ -26,7 +27,7 @@ class JanggiGame:
         get_opponent, is_in_check, is_checkmate, make_move, undo_move,
         update_generals
     """
-    def __init__(self) -> object:
+    def __init__(self):
         """
         Creates a JanggiGame.
         Private data members:
@@ -384,6 +385,7 @@ class Board:
     Data members: See __init__
     Methods: get_general_position, set_general_position, move_piece, get_board,
         display_board, get_occupation, set_occupation, clear_position,
+        _init_board_dict
     """
     def __init__(self):
         """
@@ -396,26 +398,29 @@ class Board:
                 {color (str): position (str)}
         """
         self._general_position = {'red': 'e2', 'blue': 'e9'}
-        self._board = {'a1': 'rch1', 'b1': 'rel1', 'c1': 'rho1', 'd1': 'rgu1', 'e1': '----',
-                       'f1': 'rgu2', 'g1': 'rel2', 'h1': 'rho2', 'i1': 'rch2',
-                       'a2': '----', 'b2': '----', 'c2': '----', 'd2': '----', 'e2': 'rge1',
-                       'f2': '----', 'g2': '----', 'h2': '----', 'i2': '----',
-                       'a3': '----', 'b3': 'rca1', 'c3': '----', 'd3': '----', 'e3': '----',
-                       'f3': '----', 'g3': '----', 'h3': 'rca2', 'i3': '----',
-                       'a4': 'rso1', 'b4': '----', 'c4': 'rso2', 'd4': '----', 'e4': 'rso3',
-                       'f4': '----', 'g4': 'rso4', 'h4': '----', 'i4': 'rso5',
-                       'a5': '----', 'b5': '----', 'c5': '----', 'd5': '----', 'e5': '----',
-                       'f5': '----', 'g5': '----', 'h5': '----', 'i5': '----',
-                       'a6': '----', 'b6': '----', 'c6': '----', 'd6': '----', 'e6': '----',
-                       'f6': '----', 'g6': '----', 'h6': '----', 'i6': '----',
-                       'a7': 'bso1', 'b7': '----', 'c7': 'bso2', 'd7': '----', 'e7': 'bso3',
-                       'f7': '----', 'g7': 'bso4', 'h7': '----', 'i7': 'bso5',
-                       'a8': '----', 'b8': 'bca1', 'c8': '----', 'd8': '----', 'e8': '----',
-                       'f8': '----', 'g8': '----', 'h8': 'bca2', 'i8': '----',
-                       'a9': '----', 'b9': '----', 'c9': '----', 'd9': '----', 'e9': 'bge1',
-                       'f9': '----', 'g9': '----', 'h9': '----', 'i9': '----',
-                       'a10': 'bch1', 'b10': 'bel1', 'c10': 'bho1', 'd10': 'bgu1', 'e10': '----',
-                       'f10': 'bgu2', 'g10': 'bel2', 'h10': 'bho2', 'i10': 'bch2'}
+        self._board = self._init_board_dict()
+
+    def _init_board_dict(self):
+        """Returns the board dictionary {position (str): piece_id (str)}
+        with the pieces in their starting positions."""
+
+        board = {'a1': 'rch1', 'b1': 'rel1', 'c1': 'rho1', 'd1': 'rgu1',
+                 'f1': 'rgu2', 'g1': 'rel2', 'h1': 'rho2', 'i1': 'rch2',
+                 'e2': 'rge1', 'b3': 'rca1', 'h3': 'rca2', 'a4': 'rso1',
+                 'c4': 'rso2', 'e4': 'rso3', 'g4': 'rso4', 'i4': 'rso5',
+                 'a7': 'bso1', 'c7': 'bso2', 'e7': 'bso3', 'g7': 'bso4',
+                 'i7': 'bso5', 'b8': 'bca1', 'h8': 'bca2', 'e9': 'bge1',
+                 'a10': 'bch1', 'b10': 'bel1', 'c10': 'bho1', 'd10': 'bgu1',
+                 'f10': 'bgu2', 'g10': 'bel2', 'h10': 'bho2', 'i10': 'bch2'}
+
+        # unoccupied positions are indicated by '----'
+        for col in 'abcdefghi':
+            for row in range(1, 11):
+                position = col + str(row)
+                if position not in board:
+                    board[position] = '----'
+
+        return board
 
     def get_general_position(self, color):
         """Takes a color (str 'red' or 'blue') and returns the position of
@@ -485,40 +490,29 @@ class Board:
         """Displays the board with the pieces in their current positions."""
         board = self.get_board()
 
-        # print board with pieces
-        print('     a    b    c    d    e    f    g    h    i\n'
-              '1  %s %s %s %s %s %s %s %s %s \n'
-              '2  %s %s %s %s %s %s %s %s %s \n'
-              '3  %s %s %s %s %s %s %s %s %s \n'
-              '4  %s %s %s %s %s %s %s %s %s \n'
-              '5  %s %s %s %s %s %s %s %s %s \n'
-              '6  %s %s %s %s %s %s %s %s %s \n'
-              '7  %s %s %s %s %s %s %s %s %s \n'
-              '8  %s %s %s %s %s %s %s %s %s \n'
-              '9  %s %s %s %s %s %s %s %s %s \n'
-              '10 %s %s %s %s %s %s %s %s %s \n'
+        # print the column headers
+        print('     a    b    c    d    e    f    g    h    i')
 
-              %(board.get('a1'), board.get('b1'), board.get('c1'), board.get('d1'), board.get('e1'),
-                board.get('f1'), board.get('g1'), board.get('h1'), board.get('i1'),
-                board.get('a2'), board.get('b2'), board.get('c2'), board.get('d2'), board.get('e2'),
-                board.get('f2'), board.get('g2'), board.get('h2'), board.get('i2'),
-                board.get('a3'), board.get('b3'), board.get('c3'), board.get('d3'), board.get('e3'),
-                board.get('f3'), board.get('g3'), board.get('h3'), board.get('i3'),
-                board.get('a4'), board.get('b4'), board.get('c4'), board.get('d4'), board.get('e4'),
-                board.get('f4'), board.get('g4'), board.get('h4'), board.get('i4'),
-                board.get('a5'), board.get('b5'), board.get('c5'), board.get('d5'), board.get('e5'),
-                board.get('f5'), board.get('g5'), board.get('h5'), board.get('i5'),
-                board.get('a6'), board.get('b6'), board.get('c6'), board.get('d6'), board.get('e6'),
-                board.get('f6'), board.get('g6'), board.get('h6'), board.get('i6'),
-                board.get('a7'), board.get('b7'), board.get('c7'), board.get('d7'), board.get('e7'),
-                board.get('f7'), board.get('g7'), board.get('h7'), board.get('i7'),
-                board.get('a8'), board.get('b8'), board.get('c8'), board.get('d8'), board.get('e8'),
-                board.get('f8'), board.get('g8'), board.get('h8'), board.get('i8'),
-                board.get('a9'), board.get('b9'), board.get('c9'), board.get('d9'), board.get('e9'),
-                board.get('f9'), board.get('g9'), board.get('h9'), board.get('i9'),
-                board.get('a10'), board.get('b10'), board.get('c10'), board.get('d10'), board.get('e10'),
-                board.get('f10'), board.get('g10'), board.get('h10'), board.get('i10')
-                ))
+        # print the board, one row at a time, by first making a list for the row
+        for row in range(1, 11):
+
+            # start row with number
+            row_list = [str(row)]
+
+            # extra space after single digits so they match the '10 '
+            if row < 10:
+                row_list.append('')
+
+            # fill the row_list
+            for col in 'abcdefghi':
+                position = col + str(row)
+                row_list.append(board[position])
+
+            # display piece_ids in row_list separated by spaces
+            print(*row_list)
+
+        # finish with blank line
+        print()
 
 
 class Player:
