@@ -1,5 +1,5 @@
 # Author: Travis Harris
-# Date: 3/27/2021
+# Date: 5/27/2021
 # Description: Run this file to play two-player Janggi with a GUI. JanggiGame.py
 # and the images direction should should be in the same directory as this file.
 # Mouse clicks are used to move pieces by selecting one and choosing one of the

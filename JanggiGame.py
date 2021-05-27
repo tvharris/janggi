@@ -1,5 +1,5 @@
 # Author: Travis Harris
-# Date: 3/27/2021
+# Date: 5/27/2021
 # Description: Implementation of the board game Janggi, with a class (JanggiGame)
 # for playing the game. Other classes include Board, PLayer, Piece, and one for
 # each piece type. Running this file will start the game in terminal mode, which
