@@ -1,9 +1,9 @@
 # Author: Travis Harris
 # Date: 5/27/2021
 # Description: Run this file to play two-player Janggi with a GUI. JanggiGame.py
-# and the images direction should should be in the same directory as this file.
+# and the images directory should be in the same directory as this file.
 # Mouse clicks are used to move pieces by selecting one and choosing one of the
-# allowed destinations. Pieces can be unselected by clicking them again or \
+# allowed destinations. Pieces can be unselected by clicking them again or
 # clicking outside of the allowed destinations. A pass button is implemented for
 # skipping turns. The screen resolution can be adjusted by changing the value of
 # BOARD_TARGET_HEIGHT.
@@ -22,7 +22,7 @@ board = game.get_board()
 # define the screen dimensions
 # change BOARD_TARGET_HEIGHT to adjust the game resolution
 # 1000 is native and sharpest
-BOARD_TARGET_HEIGHT = 1000
+BOARD_TARGET_HEIGHT = 600
 FULL_WIDTH, FULL_HEIGHT = 900, 1000
 SCALE_FACTOR = BOARD_TARGET_HEIGHT / FULL_HEIGHT
 WIDTH, HEIGHT = round(SCALE_FACTOR * FULL_WIDTH), round(SCALE_FACTOR * FULL_HEIGHT)
